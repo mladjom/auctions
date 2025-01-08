@@ -7,6 +7,11 @@ class AuctionDocument(BaseModel):
     file = models.FileField(_("File"), upload_to='auction_documents/')
     description = models.TextField(_("Description"), blank=True)
     
+    source_field = 'title'  # Use the `name` field for slug generation
+
+    slug = None  # Remove the slug field
+    meta_description = None  # Remove the meta_description field    
+    
     class Meta:
         verbose_name = _("Auction Document")
         verbose_name_plural = _("Auction Documents")

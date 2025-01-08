@@ -19,6 +19,7 @@ from datetime import datetime
 import time
 from django.db import transaction
 from django.utils.text import slugify
+from django.utils import timezone
 
 class Command(BaseCommand):
     help = 'Scrapes auction data from eaukcija.sud.rs and populates the database'
@@ -64,6 +65,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.WARNING(f"Error converting price: {price_str}"))
             return None
 
+
     def parse_serbian_date(self, date_str):
         serbian_months = {
             'јан': '01', 'феб': '02', 'мар': '03', 'апр': '04',
@@ -86,16 +88,31 @@ class Command(BaseCommand):
             time_str = parts[3]
         
         datetime_str = f"{year}-{month}-{day} {time_str}"
-        return datetime.strptime(datetime_str, "%Y-%m-%d %H:%M")
-
+        naive_datetime = datetime.strptime(datetime_str, "%Y-%m-%d %H:%M")
+        return timezone.make_aware(naive_datetime)
+    
     def split_pdf_documents(self, doc_text):
         docs = [d.strip() + '.pdf' for d in doc_text.split('.pdf') if d.strip()]
         return docs
 
+    def generate_unique_slug(self, base_slug, model_class):
+        """
+        Helper method of Command class to generate a unique slug for any model
+        """
+        slug = base_slug
+        counter = 1
+        
+        while model_class.objects.filter(slug=slug).exists():
+            slug = f"{base_slug}-{counter}"
+            counter += 1
+            
+        return slug
+
     def get_or_create_category(self, name):
         if not name:
             return None
-        slug = slugify(name)
+        base_slug = slugify(name)
+        slug = self.generate_unique_slug(base_slug, Category)
         category, _ = Category.objects.get_or_create(
             name=name,
             defaults={'slug': slug}
@@ -105,21 +122,35 @@ class Command(BaseCommand):
     def get_or_create_executor(self, name):
         if not name:
             return None
+        base_slug = slugify(name)
+        slug = self.generate_unique_slug(base_slug, Executor)
         executor, _ = Executor.objects.get_or_create(
-            name=name
+            name=name,
+            defaults={'slug': slug}
         )
         return executor
 
     def get_or_create_location(self, location_data):
         if not location_data:
             return None
+            
+        name_parts = [
+            location_data.get('municipality', ''),
+            location_data.get('city', ''),
+            location_data.get('cadastral_municipality', '')
+        ]
+        name = '-'.join(filter(None, name_parts))
+        
+        base_slug = slugify(name)
+        slug = self.generate_unique_slug(base_slug, Location)
+        
         location, _ = Location.objects.get_or_create(
             municipality=location_data.get('municipality', ''),
             city=location_data.get('city', ''),
-            cadastral_municipality=location_data.get('cadastral_municipality', '')
+            cadastral_municipality=location_data.get('cadastral_municipality', ''),
+            defaults={'slug': slug}
         )
         return location
-
     def get_or_create_tags(self, tag_names):
         tags = []
         for name in tag_names:
@@ -311,7 +342,6 @@ class Command(BaseCommand):
             time.sleep(2)
         return page_url
 
-    @transaction.atomic
     def save_auction_data(self, data):
         try:
             # Get or create related objects
@@ -319,10 +349,15 @@ class Command(BaseCommand):
             executor = self.get_or_create_executor(data['additional_info'].get('executor'))
             location = self.get_or_create_location(data['additional_info'].get('location'))
             
+            # Generate unique slug for auction
+            base_slug = slugify(data['title'])
+            slug = self.generate_unique_slug(base_slug, Auction)
+            
             # Create or update auction
             auction, created = Auction.objects.update_or_create(
                 code=data['code'],
                 defaults={
+                    'slug': slug,
                     'status': data['status'],
                     'title': data['title'],
                     'url': data['url'],
@@ -355,8 +390,6 @@ class Command(BaseCommand):
         except Exception as e:
             self.stdout.write(self.style.ERROR(f"Error saving auction {data['code']}: {str(e)}"))
             raise
-
-
 
     def handle(self, *args, **options):
         driver = self.setup_webdriver(options['headless'])

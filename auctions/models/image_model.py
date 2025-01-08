@@ -7,7 +7,12 @@ class Image(BaseModel):
     file = models.ImageField(_("File"), upload_to='auction_images/')
     alt_text = models.CharField(_("Alt text"), max_length=200, blank=True)
     caption = models.TextField(_("Caption"), blank=True)
-    
+
+    source_field = 'title'  # Use the `name` field for slug generation
+
+    slug = None  # Remove the slug field
+    meta_description = None  # Remove the meta_description field   
+        
     class Meta:
         verbose_name = _("Image")
         verbose_name_plural = _("Images")
