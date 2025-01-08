@@ -50,3 +50,5 @@ Thumbs.db
 # Jupyter notebook checkpoints
 .ipynb_checkpoints/
 __pycache__/
+
+todos/
