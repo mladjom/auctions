@@ -1,0 +1,51 @@
+# Python bytecode files
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+.virtualenv/
+
+# Django stuff:
+*.log
+*.sqlite3
+db.sqlite3
+
+# Media and static files (if not using separate storage for static/media files)
+media/
+static/
+
+# IDE/editor files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# macOS-specific files
+.DS_Store
+
+# Windows-specific files
+Thumbs.db
+
+# Environment variable files
+.env
+.env.*
+*.env
+
+# Coverage reports
+.coverage
+*.cover
+
+# Django migrations (optional, if migrations are in source control)
+*/migrations/*
+
+# PyCharm-specific files
+.idea/
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
