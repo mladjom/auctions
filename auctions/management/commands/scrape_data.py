@@ -20,6 +20,7 @@ import time
 from django.db import transaction
 from django.utils.text import slugify
 from django.utils import timezone
+from ...utils.content_utils import normalize_text
 
 class Command(BaseCommand):
     help = 'Scrapes auction data from eaukcija.sud.rs and populates the database'
@@ -95,62 +96,99 @@ class Command(BaseCommand):
         docs = [d.strip() + '.pdf' for d in doc_text.split('.pdf') if d.strip()]
         return docs
 
-    def generate_unique_slug(self, base_slug, model_class):
+    def generate_unique_slug(self, base_text, model_class):
         """
-        Helper method of Command class to generate a unique slug for any model
+        Generate a unique slug for any model, handling both Cyrillic and Latin characters
         """
+        if not base_text:
+            return 'unnamed'
+        
+        # First normalize the text (convert Cyrillic to Latin if needed)
+        normalized_text = normalize_text(base_text)
+        
+        # Create base slug
+        base_slug = slugify(normalized_text)
+        
+        if not base_slug:
+            base_slug = 'unnamed'
+        
+        # Try the base slug first
         slug = base_slug
         counter = 1
         
+        # Keep trying until we find a unique slug
         while model_class.objects.filter(slug=slug).exists():
+            # Create a new slug with a number suffix
             slug = f"{base_slug}-{counter}"
             counter += 1
             
         return slug
 
     def get_or_create_category(self, name):
+        """
+        Get or create a category with proper slug handling for mixed character sets
+        """
         if not name:
             return None
-        base_slug = slugify(name)
-        slug = self.generate_unique_slug(base_slug, Category)
+        
+        # Normalize the name and create slug
+        normalized_name = normalize_text(name)
+        slug = self.generate_unique_slug(normalized_name, Category)
+        
+        # Keep the original name (which might be Cyrillic) in the database
         category, _ = Category.objects.get_or_create(
-            name=name,
-            defaults={'slug': slug}
+            name=name,  # Original name (might be Cyrillic)
+            defaults={'slug': slug}  # Normalized Latin slug
         )
         return category
 
     def get_or_create_executor(self, name):
+        """
+        Get or create an executor with proper slug handling for mixed character sets
+        """
         if not name:
             return None
-        base_slug = slugify(name)
-        slug = self.generate_unique_slug(base_slug, Executor)
+        
+        # Normalize the name and create slug
+        normalized_name = normalize_text(name)
+        slug = self.generate_unique_slug(normalized_name, Executor)
+        
+        # Keep the original name in the database
         executor, _ = Executor.objects.get_or_create(
-            name=name,
-            defaults={'slug': slug}
+            name=name,  # Original name (might be Cyrillic)
+            defaults={'slug': slug}  # Normalized Latin slug
         )
         return executor
 
     def get_or_create_location(self, location_data):
+        """
+        Get or create a location with proper slug handling for mixed character sets
+        """
         if not location_data:
             return None
             
-        name_parts = [
-            location_data.get('municipality', ''),
-            location_data.get('city', ''),
-            location_data.get('cadastral_municipality', '')
-        ]
-        name = '-'.join(filter(None, name_parts))
+        # Get location components
+        municipality = location_data.get('municipality', '')
+        city = location_data.get('city', '')
+        cadastral_municipality = location_data.get('cadastral_municipality', '')
         
-        base_slug = slugify(name)
-        slug = self.generate_unique_slug(base_slug, Location)
+        # Create a meaningful name from location components
+        name_parts = [municipality, city, cadastral_municipality]
+        name = ' '.join(filter(None, name_parts))
         
+        # Normalize the combined name and create slug
+        normalized_name = normalize_text(name)
+        slug = self.generate_unique_slug(normalized_name, Location)
+        
+        # Keep original names (which might be Cyrillic) in the database
         location, _ = Location.objects.get_or_create(
-            municipality=location_data.get('municipality', ''),
-            city=location_data.get('city', ''),
-            cadastral_municipality=location_data.get('cadastral_municipality', ''),
+            municipality=municipality,
+            city=city,
+            cadastral_municipality=cadastral_municipality,
             defaults={'slug': slug}
         )
         return location
+
     def get_or_create_tags(self, tag_names):
         tags = []
         for name in tag_names:
@@ -349,9 +387,9 @@ class Command(BaseCommand):
             executor = self.get_or_create_executor(data['additional_info'].get('executor'))
             location = self.get_or_create_location(data['additional_info'].get('location'))
             
-            # Generate unique slug for auction
-            base_slug = slugify(data['title'])
-            slug = self.generate_unique_slug(base_slug, Auction)
+            # Normalize the title and create slug
+            normalized_title = normalize_text(data['title'])
+            slug = self.generate_unique_slug(normalized_title, Auction)
             
             # Create or update auction
             auction, created = Auction.objects.update_or_create(
@@ -359,7 +397,7 @@ class Command(BaseCommand):
                 defaults={
                     'slug': slug,
                     'status': data['status'],
-                    'title': data['title'],
+                    'title': data['title'],  # Keep original title (might be Cyrillic)
                     'url': data['url'],
                     'publication_date': data['publication_date'],
                     'start_time': data['start_time'],
@@ -375,11 +413,10 @@ class Command(BaseCommand):
                 }
             )
             
-            # Handle tags
+            # Handle tags and documents
             tags = self.get_or_create_tags(data['additional_info'].get('tags', []))
             auction.tags.set(tags)
             
-            # Handle documents
             self.create_or_update_documents(
                 auction,
                 data['additional_info'].get('documents', [])
@@ -446,4 +483,3 @@ class Command(BaseCommand):
             self.stdout.write(self.style.ERROR(f"Error during scraping: {str(e)}"))
         finally:
             driver.quit()
-

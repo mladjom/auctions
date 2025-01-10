@@ -24,9 +24,3 @@ class Location(BaseModel):
         Define the absolute URL for a Location instance.
         """
         return reverse('location-detail', kwargs={'slug': self.slug})
-
-    def save(self, *args, **kwargs):
-        # Automatically generate slug if not already set
-        if not self.slug:
-            self.slug = slugify(self.city)
-        super().save(*args, **kwargs)

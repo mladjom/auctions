@@ -2,7 +2,6 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from .base_model import BaseModel
 from django.urls import reverse
-from django.utils.text import slugify
 
 class Tag(BaseModel):
     name = models.CharField(_("Name"), max_length=100)
@@ -23,9 +22,3 @@ class Tag(BaseModel):
         Define the absolute URL for a Tag instance.
         """
         return reverse('tag-detail', kwargs={'slug': self.slug})
-
-    def save(self, *args, **kwargs):
-        # Automatically generate slug if not already set
-        if not self.slug:
-            self.slug = slugify(self.name)
-        super().save(*args, **kwargs)

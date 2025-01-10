@@ -13,7 +13,9 @@ from django.urls import reverse
 class Auction(BaseModel):
     STATUS_CHOICES = [
         ('CONFIRMATION_IN_PROGRESS', _('Потврђивање у току')),
-        ('ACTIVE', _('Потврђено'))
+        ('CONFIRMATION_IN_PROGRESS', _('ПОТВРЂИВАЊЕ У ТОКУ')),
+        ('ACTIVE', _('Потврђено')),
+        ('ACTIVE', _('ПОТВРЂЕНО'))
     ]
 
     # Basic information
@@ -96,9 +98,3 @@ class Auction(BaseModel):
     
     def get_absolute_url(self):
         return reverse('auction-detail', args=[str(self.slug)])
-
-    def save(self, *args, **kwargs):
-        # Automatically generate slug if not already set
-        if not self.slug:
-            self.slug = slugify(self.title)
-        super().save(*args, **kwargs)

@@ -2,6 +2,8 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
+from ..utils.content_utils import normalize_text
+from django.utils import timezone
 
 class BaseModel(models.Model):
     slug = models.SlugField(max_length=255, unique=True, verbose_name=_('Slug'))
@@ -18,15 +20,42 @@ class BaseModel(models.Model):
         """
         raise NotImplementedError("Subclasses must implement `get_absolute_url`")
 
-    def get_slug_source(self):
+    def generate_unique_slug(self, source_text):
         """
-        Determine the source field for the slug.
-        Subclasses must define a `source_field` property or override this method.
+        Generate a unique slug from the source text
         """
-        if hasattr(self, 'source_field'):
-            return getattr(self, self.source_field)
-        raise NotImplementedError("Subclasses must define `source_field` or override `get_slug_source`.")
+        base_slug = slugify(normalize_text(source_text))
+        if not base_slug:
+            base_slug = f"unnamed-{self.__class__.__name__.lower()}"
+        
+        # Query existing objects of this class
+        model_class = self.__class__
+        existing_objects = model_class.objects.filter(slug__startswith=base_slug)
+        
+        if not existing_objects.exists():
+            return base_slug
+            
+        # Find the highest number suffix
+        max_suffix = 0
+        for obj in existing_objects:
+            try:
+                # Split the slug and get the number suffix if it exists
+                suffix = obj.slug.replace(f"{base_slug}-", "")
+                if suffix.isdigit():
+                    max_suffix = max(max_suffix, int(suffix))
+            except (ValueError, AttributeError):
+                continue
+        
+        # Return new slug with incremented suffix
+        return f"{base_slug}-{max_suffix + 1}"
 
+    def get_slug_source(self):
+        if hasattr(self, 'source_field'):
+            source_value = getattr(self, self.source_field)
+            if source_value:
+                return source_value
+        return f"{self.__class__.__name__.lower()}-{timezone.now().timestamp()}"
+    
     @property
     def seo_meta_description(self):
         """
