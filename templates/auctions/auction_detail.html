@@ -1,0 +1,139 @@
+{# templates/auctions/auction_detail.html #}
+{% extends "base.html" %}
+
+{% block meta_tags %}
+    <title>{{ meta_title }}</title>
+    <meta name="description" content="{{ meta_description }}">
+{% endblock %}
+
+{% block content %}
+    {% include "auctions/components/breadcrumbs.html" %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8">
+                <h1 class="mb-4">{{ auction.title }}</h1>
+                
+                {% if auction.images.exists %}
+                    <div id="auctionCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            {% for image in auction.images.all %}
+                                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                    <img src="{{ image.file.url }}" 
+                                         class="d-block w-100" 
+                                         alt="{{ image.alt_text }}">
+                                    {% if image.caption %}
+                                        <div class="carousel-caption">
+                                            <p>{{ image.caption }}</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                        {% if auction.images.count > 1 %}
+                            <button class="carousel-control-prev" type="button" 
+                                    data-bs-target="#auctionCarousel" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" 
+                                    data-bs-target="#auctionCarousel" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                <div class="mb-4">
+                    <h2>Description</h2>
+                    {{ auction.description|linebreaks }}
+                </div>
+
+                {% if auction.documents.exists %}
+                    <div class="mb-4">
+                        <h2>Documents</h2>
+                        <ul class="list-group">
+                            {% for doc in auction.documents.all %}
+                                <li class="list-group-item">
+                                    <a href="{{ doc.file.url }}" target="_blank">
+                                        {{ doc.title }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Auction Details</h5>
+                        <ul class="list-unstyled">
+                            <li>Code: {{ auction.code }}</li>
+                            <li>Status: {{ auction.get_status_display }}</li>
+                            <li>Starting Price: €{{ auction.starting_price }}</li>
+                            <li>Estimated Value: €{{ auction.estimated_value }}</li>
+                            <li>Bidding Step: €{{ auction.bidding_step }}</li>
+                            <li>Start Time: {{ auction.start_time }}</li>
+                            <li>End Time: {{ auction.end_time }}</li>
+                        </ul>
+                    </div>
+                </div>
+
+                {% if auction.executor %}
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Executor</h5>
+                            <p class="card-text">{{ auction.executor.name }}</p>
+                            <p class="card-text">{{ auction.executor.email }}</p>
+                            <p class="card-text">{{ auction.executor.phone }}</p>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if auction.location %}
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Location</h5>
+                            <p class="card-text">
+                                {{ auction.location.city }}, 
+                                {{ auction.location.municipality }}
+                            </p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if related_auctions %}
+            <div class="row mt-4">
+                <div class="col">
+                    <h2>Related Auctions</h2>
+                    <div class="row">
+                        {% for related in related_auctions %}
+                            <div class="col-md-4">
+                                <div class="card">
+                                    {% if related.images.first %}
+                                        <img src="{{ related.images.first.file.url }}" 
+                                             class="card-img-top" 
+                                             alt="{{ related.images.first.alt_text }}">
+                                    {% endif %}
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ related.title }}</h5>
+                                        <p class="card-text">
+                                            Starting price: €{{ related.starting_price }}
+                                        </p>
+                                        <a href="{{ related.get_absolute_url }}" 
+                                           class="btn btn-primary">View Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

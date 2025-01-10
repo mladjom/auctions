@@ -1,0 +1,34 @@
+{# templates/auctions/category_list.html #}
+{% extends "base.html" %}
+
+{% block content %}
+    {% include "auctions/components/breadcrumbs.html" %}
+
+    <div class="container">
+        <h1 class="mb-4">Categories</h1>
+        
+        <div class="row">
+            {% for category in categories %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ category.name }}</h5>
+                            <p class="card-text">{{ category.description|truncatewords:30 }}</p>
+                            <p class="card-text">
+                                <small class="text-muted">
+                                    {{ category.auction_count }} auctions
+                                </small>
+                            </p>
+                            <a href="{{ category.get_absolute_url }}" 
+                               class="btn btn-primary">View Category</a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col">
+                    <p>No categories found.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

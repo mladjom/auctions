@@ -7,6 +7,7 @@ from django.utils import timezone
 
 class BaseModel(models.Model):
     slug = models.SlugField(max_length=255, unique=True, verbose_name=_('Slug'))
+    meta_title = models.CharField(_("Meta Title"), max_length=200, blank=True)
     meta_description = models.TextField(max_length=160, blank=True, verbose_name=_('Meta Description'))
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)

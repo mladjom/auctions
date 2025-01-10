@@ -14,13 +14,18 @@ class Auction(BaseModel):
     STATUS_CHOICES = [
         ('CONFIRMATION_IN_PROGRESS', _('Потврђивање у току')),
         ('CONFIRMATION_IN_PROGRESS', _('ПОТВРЂИВАЊЕ У ТОКУ')),
-        ('ACTIVE', _('Потврђено')),
-        ('ACTIVE', _('ПОТВРЂЕНО'))
+        ('CONFIRMED', _('Потврђено')),
+        ('CONFIRMED', _('ПОТВРЂЕНО'))
     ]
 
     # Basic information
     code = models.CharField(_("Code"), max_length=20, primary_key=True)
-    status = models.CharField(_("Status"), max_length=50, choices=STATUS_CHOICES)
+    status = models.CharField(
+        max_length=30,
+        choices=STATUS_CHOICES,
+        default='draft',
+        verbose_name=_('Status')
+    )
     title = models.CharField(_("Title"), max_length=200)
     url = models.URLField(_("URL"))
 

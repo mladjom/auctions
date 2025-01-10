@@ -5,7 +5,7 @@ from .base_model import BaseModel
 class AuctionDocument(BaseModel):
     title = models.CharField(_("Title"), max_length=255)
     file = models.FileField(_("File"), upload_to='auction_documents/')
-    description = models.TextField(_("Description"), blank=True)
+    #description = models.TextField(_("Description"), blank=True)
     
     source_field = 'title'  # Use the `name` field for slug generation
 
