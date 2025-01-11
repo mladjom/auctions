@@ -21,4 +21,4 @@ class Tag(BaseModel):
         """
         Define the absolute URL for a Tag instance.
         """
-        return reverse('tag-detail', kwargs={'slug': self.slug})
+        return reverse('auctions:tag-detail', kwargs={'slug': self.slug})

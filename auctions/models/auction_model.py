@@ -102,4 +102,4 @@ class Auction(BaseModel):
         return self.status == 'Потврђено'
     
     def get_absolute_url(self):
-        return reverse('auction-detail', args=[str(self.slug)])
+        return reverse('auctions:auction-detail', kwargs={'slug': self.slug})

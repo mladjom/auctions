@@ -1,25 +1,17 @@
-{# templates/auctions/auction_list.html #}
 {% extends "base.html" %}
+
 {% block meta_tags %}
     <title>{{ meta_title }}</title>
     <meta name="description" content="{{ meta_description }}">
 {% endblock %}
-{% block content %}
-    {% include "../components/breadcrumbs.html" %}  
-    <div class="container">
-        <h1 class="mb-4">Auctions</h1>
-        
-        <div class="row mb-4">
-            <div class="col-md-8">
-                {% include "../components/search_form.html" with search_placeholder=_("Search auctions...") %}
 
-            </div>
-            <div class="col-md-4">
-                <div class="text-end">
-                    <p>Active auctions: {{ active_auctions }}</p>
-                </div>
-            </div>
-        </div>
+{% block content %}
+    {% include "../components/breadcrumbs.html" %}
+    
+    <div class="container">
+        <h1 class="mb-4">{{ object.name }}</h1>
+        <p>{{ object.description }}</p>
+
         <div class="row">
             {% for auction in auctions %}
                 <div class="col-md-4 mb-4">
@@ -37,17 +29,18 @@
                                     Starting price: €{{ auction.starting_price }}
                                 </small>
                             </p>
-                            {% comment %} <a href="{{ auction.get_absolute_url }}" 
-                               class="btn btn-primary">View Details</a> {% endcomment %}
+                            <a href="{{ auction.get_absolute_url }}" 
+                               class="btn btn-primary">View Details</a>
                         </div>
                     </div>
                 </div>
             {% empty %}
                 <div class="col">
-                    <p>No auctions found.</p>
+                    <p>No auctions found in this category.</p>
                 </div>
             {% endfor %}
         </div>
+
         {% if is_paginated %}
             {% include "../components/pagination.html" %}
         {% endif %}

@@ -1,1 +1,49 @@
-<h1>Executor List</h1>
+{# templates/auctions/executor_list.html #}
+{% extends "base.html" %}
+
+{% block content %}
+    {% include "../components/breadcrumbs.html" %}
+
+    <div class="container">
+        <h1 class="mb-4">Executors</h1>
+        
+        <div class="row">
+            <div class="col-md-8 mb-4">
+                {% include "../components/search_form.html" with search_placeholder=_("Search executors...") %}
+
+            </div>
+        </div>
+
+        <div class="row">
+            {% for executor in executors %}
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ executor.name }}</h5>
+                            <p class="card-text">
+                                <strong>Jurisdiction:</strong> {{ executor.jurisdiction }}
+                            </p>
+                            <p class="card-text">
+                                <strong>Contact:</strong><br>
+                                Email: {{ executor.email }}<br>
+                                Phone: {{ executor.phone }}
+                            </p>
+                            <p class="card-text">
+                                <small class="text-muted">
+                                    {{ executor.auction_count }} auctions<br>
+                                    Average starting price: €{{ executor.avg_price|floatformat:2 }}
+                                </small>
+                            </p>
+                            <a href="{{ executor.get_absolute_url }}" 
+                               class="btn btn-primary">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col">
+                    <p>No executors found.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

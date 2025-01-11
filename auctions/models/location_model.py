@@ -23,4 +23,4 @@ class Location(BaseModel):
         """
         Define the absolute URL for a Location instance.
         """
-        return reverse('location-detail', kwargs={'slug': self.slug})
+        return reverse('auctions:location-detail', kwargs={'slug': self.slug})

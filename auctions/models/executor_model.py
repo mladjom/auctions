@@ -24,4 +24,4 @@ class Executor(BaseModel):
         """
         Define the absolute URL for an Executor instance.
         """
-        return reverse('executor-detail', kwargs={'slug': self.slug})
+        return reverse('auctions:executor-detail', kwargs={'slug': self.slug})

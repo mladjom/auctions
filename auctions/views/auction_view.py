@@ -34,21 +34,20 @@ class AuctionListView(BaseListView):
 class AuctionDetailView(BaseDetailView):
     model = Auction
     template_name = 'auctions/auction_detail.html'
-    slug_field = 'code'
-    slug_url_kwarg = 'code'
-    
-    def get_breadcrumbs(self):
-        breadcrumbs = super().get_breadcrumbs()
-        obj = self.get_object()
-        breadcrumbs.extend([
-            {'title': 'Auctions', 'url': '/auctions/'},
-            {'title': obj.title, 'url': None}
-        ])
-        return breadcrumbs
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['related_auctions'] = self.model.objects.filter(
-            category=self.object.category
-        ).exclude(code=self.object.code)[:3]
+        auction = self.get_object()
+        
+        context.update({
+            'auction': auction,
+            'meta_title': f"Auction: {auction.title}",
+            'meta_description': auction.description[:160],
+            'related_auctions': self.model.objects.filter(
+                category=auction.category
+            ).exclude(code=auction.code)[:3]
+        })
+        
         return context

@@ -1,0 +1,39 @@
+{% load i18n %}
+<footer class="footer mt-auto py-3 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <h5>{% trans "Quick Links" %}</h5>
+                <ul class="list-unstyled">
+                    <li><a href="{% url 'auctions:auction-list' %}">{% trans "Auctions" %}</a></li>
+                    <li><a href="{% url 'auctions:category-list' %}">{% trans "Categories" %}</a></li>
+                    <li><a href="{% url 'auctions:location-list' %}">{% trans "Locations" %}</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h5>{% trans "Contact" %}</h5>
+                <address>
+                    <strong>{% trans "Auctions Platform" %}</strong><br>
+                    {% trans "Email" %}: info@example.com<br>
+                    {% trans "Phone" %}: +1234567890
+                </address>
+            </div>
+            <div class="col-md-4">
+                <h5>{% trans "Follow Us" %}</h5>
+                <div class="social-links">
+                    <a href="#" class="me-2">Facebook</a>
+                    <a href="#" class="me-2">Twitter</a>
+                    <a href="#">LinkedIn</a>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="text-center">
+            <small class="text-muted">
+                {% blocktrans with year=current_year %}
+                    © {{ year }} Auctions Platform. All rights reserved.
+                {% endblocktrans %}
+            </small>
+        </div>
+    </div>
+</footer>

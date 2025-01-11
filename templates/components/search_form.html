@@ -1,0 +1,8 @@
+
+{% load i18n %}
+<form method="get" class="d-flex">
+    <input type="search" name="q" class="form-control" 
+           placeholder="{{ search_placeholder }}" 
+           value="{{ request.GET.q|default:'' }}">
+    <button type="submit" class="btn btn-primary ms-2">{% trans "Search" %}</button>
+</form>

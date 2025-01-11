@@ -2,7 +2,6 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from .base_model import BaseModel
 from django.urls import reverse
-from django.utils.text import slugify
 
 class Category(BaseModel):
     name = models.CharField(_("Name"), max_length=100)
@@ -22,4 +21,4 @@ class Category(BaseModel):
         """
         Define the absolute URL for a Category instance.
         """
-        return reverse('category-detail', kwargs={'slug': self.slug})
+        return reverse('auctions:category-detail', kwargs={'slug': self.slug})

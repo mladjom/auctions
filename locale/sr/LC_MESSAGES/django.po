@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-11 07:29+0100\n"
+"POT-Creation-Date: 2025-01-11 13:17+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,6 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
 #: auctions/admin/auction_admin.py:9
 msgid "Document"
 msgstr ""
@@ -58,6 +59,8 @@ msgid "Additional Information"
 msgstr ""
 
 #: auctions/apps.py:7 auctions/models/auction_model.py:90
+#: templates/base.html:11 templates/partials/footer.html:8
+#: templates/partials/header.html:5
 msgid "Auctions"
 msgstr ""
 
@@ -121,7 +124,7 @@ msgstr ""
 msgid "Bidding Step"
 msgstr ""
 
-#: auctions/models/auction_model.py:43 auctions/models/category_model.py:9
+#: auctions/models/auction_model.py:43 auctions/models/category_model.py:8
 msgid "Description"
 msgstr ""
 
@@ -133,7 +136,7 @@ msgstr ""
 msgid "Location"
 msgstr ""
 
-#: auctions/models/auction_model.py:55 auctions/models/category_model.py:14
+#: auctions/models/auction_model.py:55 auctions/models/category_model.py:13
 msgid "Category"
 msgstr ""
 
@@ -178,20 +181,21 @@ msgstr ""
 msgid "Explore more about %(slug)s."
 msgstr ""
 
-#: auctions/models/category_model.py:8 auctions/models/executor_model.py:8
+#: auctions/models/category_model.py:7 auctions/models/executor_model.py:8
 #: auctions/models/tag_model.py:7
 msgid "Name"
 msgstr ""
 
-#: auctions/models/category_model.py:15
+#: auctions/models/category_model.py:14 templates/partials/footer.html:9
+#: templates/partials/header.html:22
 msgid "Categories"
 msgstr ""
 
-#: auctions/models/executor_model.py:9
+#: auctions/models/executor_model.py:9 templates/partials/footer.html:17
 msgid "Email"
 msgstr ""
 
-#: auctions/models/executor_model.py:10
+#: auctions/models/executor_model.py:10 templates/partials/footer.html:18
 msgid "Phone"
 msgstr ""
 
@@ -199,7 +203,7 @@ msgstr ""
 msgid "Jurisdiction"
 msgstr ""
 
-#: auctions/models/executor_model.py:17
+#: auctions/models/executor_model.py:17 templates/partials/header.html:32
 msgid "Executors"
 msgstr ""
 
@@ -227,7 +231,8 @@ msgstr ""
 msgid "Cadastral Municipality"
 msgstr ""
 
-#: auctions/models/location_model.py:16
+#: auctions/models/location_model.py:16 templates/partials/footer.html:10
+#: templates/partials/header.html:27
 msgid "Locations"
 msgstr ""
 
@@ -241,4 +246,64 @@ msgstr ""
 
 #: config/settings/base.py:108
 msgid "Serbian"
+msgstr ""
+
+#: templates/admin/base_site.html:3
+msgid "Django blog admin"
+msgstr ""
+
+#: templates/admin/base_site.html:7
+msgid "DjangoBlog administration"
+msgstr ""
+
+#: templates/auctions/category_list.html:16
+msgid "Search categories..."
+msgstr ""
+
+#: templates/base.html:12
+msgid "Online auction platform"
+msgstr ""
+
+#: templates/components/search_form.html:7
+msgid "Search"
+msgstr ""
+
+#: templates/partials/footer.html:6
+msgid "Quick Links"
+msgstr ""
+
+#: templates/partials/footer.html:14
+msgid "Contact"
+msgstr ""
+
+#: templates/partials/footer.html:16
+msgid "Auctions Platform"
+msgstr ""
+
+#: templates/partials/footer.html:22
+msgid "Follow Us"
+msgstr ""
+
+#: templates/partials/footer.html:33
+#, python-format
+msgid ""
+"\n"
+"                    © %(year)s Auctions Platform. All rights reserved.\n"
+"                "
+msgstr ""
+
+#: templates/partials/header.html:17
+msgid "All Auctions"
+msgstr ""
+
+#: templates/partials/header.html:65
+msgid "Admin Panel"
+msgstr ""
+
+#: templates/partials/header.html:71
+msgid "Logout"
+msgstr ""
+
+#: templates/partials/header.html:78
+msgid "Login"
 msgstr ""

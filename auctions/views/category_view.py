@@ -7,10 +7,12 @@ class CategoryListView(BaseListView):
     model = Category
     template_name = 'auctions/category_list.html'
     context_object_name = 'categories'
+    search_fields = ['name', 'description']  # Add search fields
     
     def get_queryset(self):
-        return super().get_queryset().annotate(
-            auction_count=Count('auction')
+        queryset = super().get_queryset()
+        return queryset.annotate(
+            auction_count=Count('auctions')
         )
     
     def get_breadcrumbs(self):
@@ -22,12 +24,26 @@ class CategoryListView(BaseListView):
 class CategoryDetailView(BaseDetailView):
     model = Category
     template_name = 'auctions/category_detail.html'
+    paginate_by = 12  # Same as BaseListView
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['auctions'] = Auction.objects.filter(
+        
+        # Get auctions with pagination
+        page = self.request.GET.get('page')
+        auctions = Auction.objects.filter(
             category=self.object
         ).order_by('-created_at')
+        
+        # Create paginator
+        from django.core.paginator import Paginator
+        paginator = Paginator(auctions, self.paginate_by)
+        auction_page = paginator.get_page(page)
+        
+        context['auctions'] = auction_page
+        context['is_paginated'] = auction_page.has_other_pages()
+        context['page_obj'] = auction_page
+        
         return context
     
     def get_breadcrumbs(self):

@@ -1,1 +1,28 @@
-<h1>Category Detail</h1>
+{# templates/auctions/category_detail.html #}
+{% extends "base.html" %}
+
+{% block content %}
+    {% include "../components/breadcrumbs.html" %}
+
+    <div class="container">
+        <h1 class="mb-4">{{ category.name }}</h1>
+        <div class="row mb-4">
+            <div class="col">
+                <p>{{ category.description }}</p>
+            </div>
+        </div>
+
+        <h2>Auctions in this category</h2>
+        <div class="row">
+            {% for auction in auctions %}
+                <div class="col-md-4 mb-4">
+                    {% include "../components/auction_card.html" with auction=auction %}
+                </div>
+            {% empty %}
+                <div class="col">
+                    <p>No auctions found in this category.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

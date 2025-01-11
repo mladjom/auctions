@@ -10,9 +10,10 @@ class ExecutorListView(BaseListView):
     search_fields = ['name', 'jurisdiction']
     
     def get_queryset(self):
-        return super().get_queryset().annotate(
-            auction_count=Count('auction'),
-            avg_price=Avg('auction__starting_price')
+        queryset = super().get_queryset()
+        return queryset.annotate(
+            auction_count=Count('auctions'),
+            avg_price=Avg('auctions__starting_price')
         )
     
     def get_breadcrumbs(self):

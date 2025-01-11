@@ -1,14 +1,14 @@
 # auctions/views/__init__.py
-from .auction_view import AuctionDetailView
-from .tag_view import TagDetailView
-from .location_view import LocationDetailView
-from .executor_view import ExecutorDetailView
-from .category_view import CategoryDetailView
+from .auction_view import AuctionDetailView, AuctionListView
+from .tag_view import TagDetailView, TagListView
+from .location_view import LocationDetailView, LocationListView
+from .executor_view import ExecutorDetailView, ExecutorListView
+from .category_view import CategoryDetailView, CategoryListView
 
 __all__ = [
-    'AuctionDetailView',
-    'TagDetailView',
-    'LocationDetailView',
-    'ExecutorDetailView',
-    'CategoryDetailView',
+    AuctionListView, AuctionDetailView,
+    CategoryListView, CategoryDetailView,
+    ExecutorListView, ExecutorDetailView,
+    LocationListView, LocationDetailView,
+    TagListView, TagDetailView
 ]
