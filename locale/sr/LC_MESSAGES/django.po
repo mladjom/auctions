@@ -1,0 +1,244 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-11 07:29+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+#: auctions/admin/auction_admin.py:9
+msgid "Document"
+msgstr ""
+
+#: auctions/admin/auction_admin.py:10 auctions/models/auction_model.py:81
+msgid "Documents"
+msgstr ""
+
+#: auctions/admin/auction_admin.py:18
+#: auctions/models/auction_document_model.py:6
+#: auctions/models/auction_model.py:29 auctions/models/image_model.py:6
+msgid "Title"
+msgstr ""
+
+#: auctions/admin/auction_admin.py:24
+#: auctions/models/auction_document_model.py:7 auctions/models/image_model.py:7
+msgid "File"
+msgstr ""
+
+#: auctions/admin/auction_admin.py:37
+msgid "Basic Information"
+msgstr ""
+
+#: auctions/admin/auction_admin.py:40
+msgid "Pricing"
+msgstr ""
+
+#: auctions/admin/auction_admin.py:43
+msgid "Dates"
+msgstr ""
+
+#: auctions/admin/auction_admin.py:47
+msgid "Relations"
+msgstr ""
+
+#: auctions/admin/auction_admin.py:50
+msgid "Additional Information"
+msgstr ""
+
+#: auctions/apps.py:7 auctions/models/auction_model.py:90
+msgid "Auctions"
+msgstr ""
+
+#: auctions/models/auction_document_model.py:16
+msgid "Auction Document"
+msgstr ""
+
+#: auctions/models/auction_document_model.py:17
+msgid "Auction Documents"
+msgstr ""
+
+#: auctions/models/auction_model.py:15
+msgid "Потврђивање у току"
+msgstr ""
+
+#: auctions/models/auction_model.py:16
+msgid "ПОТВРЂИВАЊЕ У ТОКУ"
+msgstr ""
+
+#: auctions/models/auction_model.py:17
+msgid "Потврђено"
+msgstr ""
+
+#: auctions/models/auction_model.py:18
+msgid "ПОТВРЂЕНО"
+msgstr ""
+
+#: auctions/models/auction_model.py:22
+msgid "Code"
+msgstr ""
+
+#: auctions/models/auction_model.py:27
+msgid "Status"
+msgstr ""
+
+#: auctions/models/auction_model.py:30
+msgid "URL"
+msgstr ""
+
+#: auctions/models/auction_model.py:33
+msgid "Publication Date"
+msgstr ""
+
+#: auctions/models/auction_model.py:34
+msgid "Start Time"
+msgstr ""
+
+#: auctions/models/auction_model.py:35
+msgid "End Time"
+msgstr ""
+
+#: auctions/models/auction_model.py:38
+msgid "Starting Price"
+msgstr ""
+
+#: auctions/models/auction_model.py:39
+msgid "Estimated Value"
+msgstr ""
+
+#: auctions/models/auction_model.py:40
+msgid "Bidding Step"
+msgstr ""
+
+#: auctions/models/auction_model.py:43 auctions/models/category_model.py:9
+msgid "Description"
+msgstr ""
+
+#: auctions/models/auction_model.py:44
+msgid "Sale Number"
+msgstr ""
+
+#: auctions/models/auction_model.py:49 auctions/models/location_model.py:15
+msgid "Location"
+msgstr ""
+
+#: auctions/models/auction_model.py:55 auctions/models/category_model.py:14
+msgid "Category"
+msgstr ""
+
+#: auctions/models/auction_model.py:62 auctions/models/executor_model.py:16
+msgid "Executor"
+msgstr ""
+
+#: auctions/models/auction_model.py:69 auctions/models/tag_model.py:14
+msgid "Tags"
+msgstr ""
+
+#: auctions/models/auction_model.py:75 auctions/models/image_model.py:18
+msgid "Images"
+msgstr ""
+
+#: auctions/models/auction_model.py:89
+msgid "Auction"
+msgstr ""
+
+#: auctions/models/base_model.py:9 auctions/models/tag_model.py:8
+msgid "Slug"
+msgstr ""
+
+#: auctions/models/base_model.py:10
+msgid "Meta Title"
+msgstr ""
+
+#: auctions/models/base_model.py:11
+msgid "Meta Description"
+msgstr ""
+
+#: auctions/models/base_model.py:12
+msgid "Created at"
+msgstr ""
+
+#: auctions/models/base_model.py:13
+msgid "Updated at"
+msgstr ""
+
+#: auctions/models/base_model.py:66
+#, python-format
+msgid "Explore more about %(slug)s."
+msgstr ""
+
+#: auctions/models/category_model.py:8 auctions/models/executor_model.py:8
+#: auctions/models/tag_model.py:7
+msgid "Name"
+msgstr ""
+
+#: auctions/models/category_model.py:15
+msgid "Categories"
+msgstr ""
+
+#: auctions/models/executor_model.py:9
+msgid "Email"
+msgstr ""
+
+#: auctions/models/executor_model.py:10
+msgid "Phone"
+msgstr ""
+
+#: auctions/models/executor_model.py:11
+msgid "Jurisdiction"
+msgstr ""
+
+#: auctions/models/executor_model.py:17
+msgid "Executors"
+msgstr ""
+
+#: auctions/models/image_model.py:8
+msgid "Alt text"
+msgstr ""
+
+#: auctions/models/image_model.py:9
+msgid "Caption"
+msgstr ""
+
+#: auctions/models/image_model.py:17
+msgid "Image"
+msgstr ""
+
+#: auctions/models/location_model.py:8
+msgid "Municipality"
+msgstr ""
+
+#: auctions/models/location_model.py:9
+msgid "City"
+msgstr ""
+
+#: auctions/models/location_model.py:10
+msgid "Cadastral Municipality"
+msgstr ""
+
+#: auctions/models/location_model.py:16
+msgid "Locations"
+msgstr ""
+
+#: auctions/models/tag_model.py:13
+msgid "Tag"
+msgstr ""
+
+#: config/settings/base.py:107
+msgid "English"
+msgstr ""
+
+#: config/settings/base.py:108
+msgid "Serbian"
+msgstr ""
