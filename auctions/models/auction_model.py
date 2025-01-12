@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.utils.text import slugify
 from .base_model import BaseModel
 from .category_model import Category
 from .tag_model import Tag
@@ -102,4 +101,4 @@ class Auction(BaseModel):
         return self.status == 'Потврђено'
     
     def get_absolute_url(self):
-        return reverse('auctions:auction-detail', kwargs={'slug': self.slug})
+        return reverse('auctions:auction-detail', args=[str(self.slug)])

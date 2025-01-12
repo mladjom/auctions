@@ -47,7 +47,12 @@ class AuctionDetailView(BaseDetailView):
             'meta_description': auction.description[:160],
             'related_auctions': self.model.objects.filter(
                 category=auction.category
-            ).exclude(code=auction.code)[:3]
+            ).exclude(code=auction.code)[:3],
+            'breadcrumbs': [
+                {'title': 'Home', 'url': '/'},
+                {'title': 'Auctions', 'url': '/auctions/'},
+                {'title': auction.title, 'url': None}
+            ]
         })
         
         return context

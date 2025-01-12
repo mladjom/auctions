@@ -89,7 +89,11 @@
                         <div class="card mb-4">
                             <div class="card-body">
                                 <h5 class="card-title">Executor</h5>
-                                <p class="card-text">{{ auction.executor.name }}</p>
+                                <p class="card-text">
+                                    <a href="{% url 'auctions:auction-list' %}executor=/{ auction.executor.slug }}">
+                                        {{ auction.executor.name }}
+                                    </a>
+                                </p>
                                 <p class="card-text">{{ auction.executor.email }}</p>
                                 <p class="card-text">{{ auction.executor.phone }}</p>
                             </div>
@@ -101,9 +105,40 @@
                             <div class="card-body">
                                 <h5 class="card-title">Location</h5>
                                 <p class="card-text">
-                                    {{ auction.location.city }}, 
-                                    {{ auction.location.municipality }}
+                                    <a href="{% url 'auctions:auction-list' %}location/{{ auction.location.slug }}">
+                                        {{ auction.location.city }}, 
+                                        {{ auction.location.municipality }}
+                                    </a>
                                 </p>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if auction.category %}
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Category</h5>
+                                <p class="card-text">
+                                    <a href="{% url 'auctions:auction-list' %}category/{{ auction.category.slug }}">
+                                        {{ auction.category.name }}
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if auction.tags.exists %}
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Tags</h5>
+                                <div class="card-text">
+                                    {% for tag in auction.tags.all %}
+                                        <a href="{% url 'auctions:auction-list' %}tag/{{ tag.slug }}" 
+                                           class="badge bg-secondary text-decoration-none me-1">
+                                            {{ tag.name }}
+                                        </a>
+                                    {% endfor %}
+                                </div>
                             </div>
                         </div>
                     {% endif %}

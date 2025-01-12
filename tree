@@ -1,0 +1,101 @@
+.
+├── auctions
+│   ├── admin
+│   │   ├── auction_admin.py
+│   │   ├── category_admin.py
+│   │   ├── document_admin.py
+│   │   ├── executor_admin.py
+│   │   ├── __init__.py
+│   │   ├── location_admin.py
+│   │   ├── mixins_admin.py
+│   │   └── tag_admin.py
+│   ├── apps.py
+│   ├── __init__.py
+│   ├── management
+│   │   └── commands
+│   │       └── scrape_data.py
+│   ├── migrations
+│   ├── models
+│   │   ├── auction_document_model.py
+│   │   ├── auction_model.py
+│   │   ├── base_model.py
+│   │   ├── category_model.py
+│   │   ├── executor_model.py
+│   │   ├── image_model.py
+│   │   ├── __init__.py
+│   │   ├── location_model.py
+│   │   └── tag_model.py
+│   ├── schema.py
+│   ├── settings.py
+│   ├── signals.py
+│   ├── sitemaps.py
+│   ├── templates
+│   │   └── auctions
+│   │       └── category_detail.html
+│   ├── templatetags
+│   │   ├── auction_filters.py
+│   │   ├── __init_.py
+│   │   └── navigation_tags.py
+│   ├── urls.py
+│   ├── utils
+│   │   ├── ai_utils.py
+│   │   ├── content_utils.py
+│   │   ├── image_utils.py
+│   │   └── scraper_utils.py
+│   └── views
+│       ├── auction_view.py
+│       ├── base_view.py
+│       ├── category_view.py
+│       ├── executor_view.py
+│       ├── __init__.py
+│       ├── location_view.py
+│       └── tag_view.py
+├── config
+│   ├── asgi.py
+│   ├── __init__.py
+│   ├── settings
+│   │   ├── base.py
+│   │   ├── development.py
+│   │   └── production.py
+│   ├── urls.py
+│   └── wsgi.py
+├── db.png
+├── locale
+│   └── sr
+│       └── LC_MESSAGES
+│           └── django.po
+├── manage.py
+├── pages
+│   ├── admin.py
+│   ├── apps.py
+│   ├── __init__.py
+│   ├── migrations
+│   ├── models.py
+│   ├── tests.py
+│   ├── urls.py
+│   └── views.py
+├── requirements.txt
+└── templates
+    ├── admin
+    │   ├── base_site.html
+    │   └── language_switch.html
+    ├── auctions
+    │   ├── auction_detail.html
+    │   ├── auction_list.html
+    │   ├── category_detail.html
+    │   ├── category_list.html
+    │   ├── executor_detail.html
+    │   ├── executor_list.html
+    │   ├── location_detail.html
+    │   ├── location_list.html
+    │   ├── tag_detail.html
+    │   └── tag_list.html
+    ├── base.html
+    ├── components
+    │   ├── auction_card.html
+    │   ├── breadcrumbs.html
+    │   ├── pagination.html
+    │   └── search_form.html
+    └── partials
+        ├── footer.html
+        └── header.html

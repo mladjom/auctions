@@ -104,8 +104,8 @@ USE_TZ = True
 TIME_ZONE = 'Europe/Belgrade'  # or your appropriate timezone
 
 LANGUAGES = [
-    ('en', _('English')),
-    ('sr', _('Serbian')),
+    ('sr', 'Serbian'),
+    ('sr-Latn', 'Serbian Latin'),
 ]
 
 LOCALE_PATHS = [BASE_DIR / 'locale']
