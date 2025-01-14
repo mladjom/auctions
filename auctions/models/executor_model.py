@@ -5,20 +5,19 @@ from django.utils.text import slugify
 from django.urls import reverse
 
 class Executor(BaseModel):
-    name = models.CharField(_("Name"), max_length=200)
     email = models.EmailField(_("Email"), blank=True)
     phone = models.CharField(_("Phone"), max_length=50, blank=True)
     jurisdiction = models.CharField(_("Jurisdiction"), max_length=200, blank=True)
 
-    source_field = 'name'  # Use the `name` field for slug generation
 
     class Meta:
         verbose_name = _("Executor")
         verbose_name_plural = _("Executors")
-        ordering = ['name']
+        ordering = ['title_sr']
 
     def __str__(self):
-        return self.name
+        return self.title_sr
+
 
     def get_absolute_url(self):
         """

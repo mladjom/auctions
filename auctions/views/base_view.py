@@ -64,3 +64,11 @@ class BaseDetailView(DetailView, BreadcrumbMixin, MetaTagsMixin):
     """
     template_name = None
     context_object_name = 'object'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Add alternate URLs for SEO
+        context['canonical_url'] = self.request.build_absolute_uri(
+            self.object.get_absolute_url()
+        )
+        return context

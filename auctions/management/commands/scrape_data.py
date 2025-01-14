@@ -20,7 +20,7 @@ import time
 from django.db import transaction
 from django.utils.text import slugify
 from django.utils import timezone
-from ...utils.content_utils import normalize_text
+from ...utils.content_utils import normalize_text, transliterate_text, is_cyrillic, latin_to_cyrillic
 
 class Command(BaseCommand):
     help = 'Scrapes auction data from eaukcija.sud.rs and populates the database'
@@ -124,97 +124,168 @@ class Command(BaseCommand):
             
         return slug
 
-    def get_or_create_category(self, name):
+
+    def get_or_create_category(self, name_sr):
         """
-        Get or create a category with proper slug handling for mixed character sets
+        Get or create a category with both Cyrillic and Latin titles
         """
-        if not name:
+        if not name_sr:
             return None
         
-        # Normalize the name and create slug
-        normalized_name = normalize_text(name)
-        slug = self.generate_unique_slug(normalized_name, Category)
+        # Create Latin version
+        name_lat = transliterate_text(name_sr)
         
-        # Keep the original name (which might be Cyrillic) in the database
+        # Generate slug from Latin version
+        slug = self.generate_unique_slug(normalize_text(name_sr), Category)
+        
+        # Create or update with both versions
         category, _ = Category.objects.get_or_create(
-            name=name,  # Original name (might be Cyrillic)
-            defaults={'slug': slug}  # Normalized Latin slug
+            title_sr=name_sr,
+            defaults={
+                'title_lat': name_lat,
+                'slug': slug,
+                'meta_title_sr': name_sr,
+                'meta_title_lat': name_lat,
+                'meta_description_sr': name_sr,
+                'meta_description_lat': name_lat
+            }
         )
         return category
 
-    def get_or_create_executor(self, name):
+    def get_or_create_executor(self, name_sr):
         """
-        Get or create an executor with proper slug handling for mixed character sets
+        Get or create an executor with both Cyrillic and Latin titles,
+        handling cases where the input might be in Latin script.
         """
-        if not name:
+        if not name_sr:
             return None
         
-        # Normalize the name and create slug
-        normalized_name = normalize_text(name)
-        slug = self.generate_unique_slug(normalized_name, Executor)
+        # Convert to Cyrillic if the input is in Latin
+        if not is_cyrillic(name_sr):
+            name_sr = latin_to_cyrillic(name_sr)
         
-        # Keep the original name in the database
+        # Create Latin version from the (now definitely) Cyrillic name
+        name_lat = transliterate_text(name_sr)
+        
+        # Generate slug from Latin version
+        slug = self.generate_unique_slug(normalize_text(name_sr), Executor)
+        
+        # Create or update with both versions
         executor, _ = Executor.objects.get_or_create(
-            name=name,  # Original name (might be Cyrillic)
-            defaults={'slug': slug}  # Normalized Latin slug
+            title_sr=name_sr,
+            defaults={
+                'title_lat': name_lat,
+                'slug': slug,
+                'meta_title_sr': name_sr,
+                'meta_title_lat': name_lat,
+                'meta_description_sr': name_sr,
+                'meta_description_lat': name_lat
+            }
         )
         return executor
 
     def get_or_create_location(self, location_data):
         """
-        Get or create a location with proper slug handling for mixed character sets
+        Get or create a location with both Cyrillic and Latin titles
         """
         if not location_data:
             return None
-            
+        
         # Get location components
-        municipality = location_data.get('municipality', '')
-        city = location_data.get('city', '')
-        cadastral_municipality = location_data.get('cadastral_municipality', '')
+        municipality_sr = location_data.get('municipality', '')
+        city_sr = location_data.get('city', '')
+        cadastral_municipality_sr = location_data.get('cadastral_municipality', '')
         
-        # Create a meaningful name from location components
-        name_parts = [municipality, city, cadastral_municipality]
-        name = ' '.join(filter(None, name_parts))
+        # Transliterate components to Latin
+        municipality_lat = transliterate_text(municipality_sr)
+        city_lat = transliterate_text(city_sr)
+        cadastral_municipality_lat = transliterate_text(cadastral_municipality_sr)
         
-        # Normalize the combined name and create slug
-        normalized_name = normalize_text(name)
-        slug = self.generate_unique_slug(normalized_name, Location)
+        # Create combined titles
+        name_parts_sr = [municipality_sr, city_sr, cadastral_municipality_sr]
+        name_parts_lat = [municipality_lat, city_lat, cadastral_municipality_lat]
         
-        # Keep original names (which might be Cyrillic) in the database
+        title_sr = ' '.join(filter(None, name_parts_sr))
+        title_lat = ' '.join(filter(None, name_parts_lat))
+        
+        # Generate slug from Latin version
+        slug = self.generate_unique_slug(normalize_text(title_sr), Location)
+        
+        # Create or update with both versions
         location, _ = Location.objects.get_or_create(
-            municipality=municipality,
-            city=city,
-            cadastral_municipality=cadastral_municipality,
-            defaults={'slug': slug}
+            municipality=municipality_sr,
+            city=city_sr,
+            cadastral_municipality=cadastral_municipality_sr,
+            defaults={
+                'title_sr': title_sr,
+                'title_lat': title_lat,
+                'slug': slug,
+                'meta_title_sr': title_sr,
+                'meta_title_lat': title_lat,
+                'meta_description_sr': title_sr,
+                'meta_description_lat': title_lat
+            }
         )
         return location
 
-    def get_or_create_tags(self, tag_names):
+    def get_or_create_tags(self, tag_names_sr):
+        """
+        Get or create tags with both Cyrillic and Latin titles
+        """
         tags = []
-        for name in tag_names:
-            if name:
+        for name_sr in tag_names_sr:
+            if name_sr:
+                # Create Latin version
+                name_lat = transliterate_text(name_sr)
+                
+                # Generate slug from Latin version
+                slug = self.generate_unique_slug(normalize_text(name_sr), Tag)
+                
+                # Create or update with both versions
                 tag, _ = Tag.objects.get_or_create(
-                    name=name,
-                    defaults={'slug': slugify(name)}
+                    title_sr=name_sr,
+                    defaults={
+                        'title_lat': name_lat,
+                        'slug': slug,
+                        'meta_title_sr': name_sr,
+                        'meta_title_lat': name_lat,
+                        'meta_description_sr': name_sr,
+                        'meta_description_lat': name_lat
+                    }
                 )
                 tags.append(tag)
         return tags
 
-    def create_or_update_documents(self, auction, document_names):
-        existing_docs = {doc.title: doc for doc in auction.documents.all()}
+    def create_or_update_documents(self, auction, document_names_sr):
+        """
+        Create or update documents with both Cyrillic and Latin titles
+        """
+        existing_docs = {doc.title_sr: doc for doc in auction.documents.all()}
         
         # Create new documents
-        for doc_name in document_names:
-            if doc_name not in existing_docs:
+        for name_sr in document_names_sr:
+            if name_sr not in existing_docs:
+                # Create Latin version
+                name_lat = transliterate_text(name_sr)
+                
+                # Generate slug from Latin version
+                #slug = self.generate_unique_slug(normalize_text(name_sr), AuctionDocument)
+                
                 doc = AuctionDocument.objects.create(
-                    title=doc_name,
-                    file=f'auction_documents/{auction.code}/{doc_name}'
+                    title_sr=name_sr,
+                    title_lat=name_lat,
+                    # slug=slug,
+                    # meta_title_sr=name_sr,
+                    # meta_title_lat=name_lat,
+                    # meta_description_sr=name_sr,
+                    # meta_description_lat=name_lat,
+                    file=f'auction_documents/{auction.code}/{name_sr}'
                 )
                 auction.documents.add(doc)
         
         # Remove documents that no longer exist
         for doc_name in existing_docs:
-            if doc_name not in document_names:
+            if doc_name not in document_names_sr:
                 auction.documents.remove(existing_docs[doc_name])
 
     def extract_details(self, driver, auction_code, current_url):
@@ -387,9 +458,24 @@ class Command(BaseCommand):
             executor = self.get_or_create_executor(data['additional_info'].get('executor'))
             location = self.get_or_create_location(data['additional_info'].get('location'))
             
-            # Normalize the title and create slug
-            normalized_title = normalize_text(data['title'])
-            slug = self.generate_unique_slug(normalized_title, Auction)
+            # Original title (Cyrillic) and description
+            title_sr = data['title']
+            description_sr = data['additional_info'].get('description', '')
+            
+            # Convert to Latin script using proper Serbian transliteration
+            title_lat = transliterate_text(title_sr)
+            description_lat = transliterate_text(description_sr)
+            
+            # Generate slug from simplified Latin version (using normalize_text to avoid URL issues)
+            slug = self.generate_unique_slug(normalize_text(title_sr), Auction)
+            
+            # Generate meta fields
+            meta_title_sr = f"{title_sr} - еАукција {data['code']}"
+            meta_title_lat = f"{title_lat} - eAukcija {data['code']}"
+            
+            # Create meta descriptions by truncating main descriptions
+            meta_description_sr = description_sr[:160] + '...' if len(description_sr) > 160 else description_sr
+            meta_description_lat = description_lat[:160] + '...' if len(description_lat) > 160 else description_lat
             
             # Create or update auction
             auction, created = Auction.objects.update_or_create(
@@ -397,7 +483,17 @@ class Command(BaseCommand):
                 defaults={
                     'slug': slug,
                     'status': data['status'],
-                    'title': data['title'],  # Keep original title (might be Cyrillic)
+                    # Serbian Cyrillic content
+                    'title_sr': title_sr,
+                    'description_sr': description_sr,
+                    'meta_title_sr': meta_title_sr,
+                    'meta_description_sr': meta_description_sr,
+                    # Serbian Latin content (properly transliterated)
+                    'title_lat': title_lat,
+                    'description_lat': description_lat,
+                    'meta_title_lat': meta_title_lat,
+                    'meta_description_lat': meta_description_lat,
+                    # Other fields
                     'url': data['url'],
                     'publication_date': data['publication_date'],
                     'start_time': data['start_time'],
@@ -405,7 +501,6 @@ class Command(BaseCommand):
                     'starting_price': data['pricing']['starting_price'],
                     'estimated_value': data['pricing']['estimated_value'],
                     'bidding_step': data['pricing']['bidding_step'],
-                    'description': data['additional_info'].get('description', ''),
                     'sale_number': data['additional_info'].get('sale_number', ''),
                     'category': category,
                     'executor': executor,

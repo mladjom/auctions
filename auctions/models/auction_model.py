@@ -12,9 +12,7 @@ from django.urls import reverse
 class Auction(BaseModel):
     STATUS_CHOICES = [
         ('CONFIRMATION_IN_PROGRESS', _('Потврђивање у току')),
-        ('CONFIRMATION_IN_PROGRESS', _('ПОТВРЂИВАЊЕ У ТОКУ')),
         ('CONFIRMED', _('Потврђено')),
-        ('CONFIRMED', _('ПОТВРЂЕНО'))
     ]
 
     # Basic information
@@ -22,10 +20,9 @@ class Auction(BaseModel):
     status = models.CharField(
         max_length=30,
         choices=STATUS_CHOICES,
-        default='draft',
+        default='CONFIRMATION_IN_PROGRESS',
         verbose_name=_('Status')
     )
-    title = models.CharField(_("Title"), max_length=200)
     url = models.URLField(_("URL"))
 
     # Dates
@@ -34,12 +31,23 @@ class Auction(BaseModel):
     end_time = models.DateTimeField(_("End Time"))
 
     # Pricing
-    starting_price = models.DecimalField(_("Starting Price"), max_digits=10, decimal_places=2)
-    estimated_value = models.DecimalField(_("Estimated Value"), max_digits=10, decimal_places=2)
-    bidding_step = models.DecimalField(_("Bidding Step"), max_digits=10, decimal_places=2)
+    starting_price = models.DecimalField(
+        _("Starting Price"), 
+        max_digits=10, 
+        decimal_places=2
+    )
+    estimated_value = models.DecimalField(
+        _("Estimated Value"), 
+        max_digits=10, 
+        decimal_places=2
+    )
+    bidding_step = models.DecimalField(
+        _("Bidding Step"), 
+        max_digits=10, 
+        decimal_places=2
+    )
 
-    # Content
-    description = models.TextField(_("Description"), blank=True)
+    # Additional Info
     sale_number = models.CharField(_("Sale Number"), max_length=50)
 
     # Relations
@@ -82,8 +90,6 @@ class Auction(BaseModel):
         related_name='auctions'
     )
 
-    source_field = 'title'  # Use the `name` field for slug generation
-
     class Meta:
         verbose_name = _("Auction")
         verbose_name_plural = _("Auctions")
@@ -95,10 +101,10 @@ class Auction(BaseModel):
         ]
 
     def __str__(self):
-        return f"{self.code} - {self.title}"
+        return f"{self.code} - {self.title_sr}"
 
     def is_active(self):
-        return self.status == 'Потврђено'
-    
+        return self.status == 'CONFIRMED'
+
     def get_absolute_url(self):
         return reverse('auctions:auction-detail', args=[str(self.slug)])

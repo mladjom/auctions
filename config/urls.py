@@ -12,6 +12,7 @@ urlpatterns += i18n_patterns(
     path('accounts/', include('django.contrib.auth.urls')),
     path('', include('auctions.urls')),
     path('', include('pages.urls')),
+    prefix_default_language=True
 )
 
 if settings.DEBUG:
