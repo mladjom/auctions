@@ -2,7 +2,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
-from auctions.utils.content_utils import normalize_text, transliterate_text
+from auctions.utils.content_utils import SerbianTextConverter
 from django.utils import timezone
 from django.utils.translation import get_language
 
@@ -33,35 +33,6 @@ class BaseModel(models.Model):
         """
         raise NotImplementedError("Subclasses must implement `get_absolute_url`")
 
-    def generate_unique_slug(self, source_text):
-        """
-        Generate a unique slug from the source text
-        """
-        base_slug = slugify(normalize_text(source_text))
-        if not base_slug:
-            base_slug = f"unnamed-{self.__class__.__name__.lower()}"
-        
-        # Query existing objects of this class
-        model_class = self.__class__
-        existing_objects = model_class.objects.filter(slug__startswith=base_slug)
-        
-        if not existing_objects.exists():
-            return base_slug
-            
-        # Find the highest number suffix
-        max_suffix = 0
-        for obj in existing_objects:
-            try:
-                # Split the slug and get the number suffix if it exists
-                suffix = obj.slug.replace(f"{base_slug}-", "")
-                if suffix.isdigit():
-                    max_suffix = max(max_suffix, int(suffix))
-            except (ValueError, AttributeError):
-                continue
-        
-        # Return new slug with incremented suffix
-        return f"{base_slug}-{max_suffix + 1}"
-
     def get_slug_source(self):
         if hasattr(self, 'source_field'):
             source_value = getattr(self, self.source_field)
@@ -80,18 +51,22 @@ class BaseModel(models.Model):
     def save(self, *args, **kwargs):
         # Auto-generate Latin versions if not provided
         if not self.title_lat and self.title_sr:
-            self.title_lat = transliterate_text(self.title_sr)
+            self.title_lat = SerbianTextConverter.to_latin(self.title_sr)
         if not self.description_lat and self.description_sr:
-            self.description_lat = transliterate_text(self.description_sr)
+            self.description_lat = SerbianTextConverter.to_latin(self.description_sr)
         if not self.meta_title_lat and self.meta_title_sr:
-            self.meta_title_lat = transliterate_text(self.meta_title_sr)
+            self.meta_title_lat = SerbianTextConverter.to_latin(self.meta_title_sr)
         if not self.meta_description_lat and self.meta_description_sr:
-            self.meta_description_lat = transliterate_text(self.meta_description_sr)
+            self.meta_description_lat = SerbianTextConverter.to_latin(self.meta_description_sr)
 
-        # Generate slug from Latin title
-        if not self.slug and self.title_sr:
-            self.slug = slugify(self.title_lat or transliterate_text(self.title_sr))
-            
+        # Generate or update the slug
+        if not self.slug:
+            self.slug = SerbianTextConverter.generate_unique_slug(
+                source_text=self.title_lat or SerbianTextConverter.to_latin(self.title_sr),
+                model_class=self.__class__,
+                existing_instance=self,
+            )
+
         super().save(*args, **kwargs)
 
     @property

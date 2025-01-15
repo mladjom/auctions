@@ -7,8 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>{% block meta_title %}{{ object.meta_title }}{% endblock %}</title>
-    <meta name="description" content="{% block meta_description %}{{ object.meta_description }}{% endblock %}">
+
     
     {# SEO alternate links #}
     <link rel="canonical" href="{{ canonical_url }}" />
@@ -16,12 +15,12 @@
     <link rel="alternate" hreflang="sr-Latn" href="/lat{{ request.path }}" />
     
     {# OpenGraph tags #}
-    <meta property="og:title" content="{{ object.meta_title }}" />
+    {% comment %} <meta property="og:title" content="{{ object.meta_title }}" />
     <meta property="og:description" content="{{ object.meta_description }}" />
-    <meta property="og:locale" content="sr_RS{% if LANGUAGE_CODE == 'sr-Latn' %}_Latn{% endif %}" />
+    <meta property="og:locale" content="sr_RS{% if LANGUAGE_CODE == 'sr-Latn' %}_Latn{% endif %}" /> {% endcomment %}
 
     {% block meta_tags %}
-        <title>{% block title %}{% trans "Auctions" %}{% endblock %}</title>
+        <title>{% block meta_title %}{% trans "Auctions" %}{% endblock %}</title>
         <meta name="description" content="{% block meta_description %}{% trans 'Online auction platform' %}{% endblock %}">
     {% endblock %}
 

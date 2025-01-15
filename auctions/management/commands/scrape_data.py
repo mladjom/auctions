@@ -20,8 +20,7 @@ import time
 from django.db import transaction
 from django.utils.text import slugify
 from django.utils import timezone
-from ...utils.content_utils import normalize_text, transliterate_text, is_cyrillic, latin_to_cyrillic
-
+from ...utils.content_utils import SerbianTextConverter
 class Command(BaseCommand):
     help = 'Scrapes auction data from eaukcija.sud.rs and populates the database'
 
@@ -96,34 +95,6 @@ class Command(BaseCommand):
         docs = [d.strip() + '.pdf' for d in doc_text.split('.pdf') if d.strip()]
         return docs
 
-    def generate_unique_slug(self, base_text, model_class):
-        """
-        Generate a unique slug for any model, handling both Cyrillic and Latin characters
-        """
-        if not base_text:
-            return 'unnamed'
-        
-        # First normalize the text (convert Cyrillic to Latin if needed)
-        normalized_text = normalize_text(base_text)
-        
-        # Create base slug
-        base_slug = slugify(normalized_text)
-        
-        if not base_slug:
-            base_slug = 'unnamed'
-        
-        # Try the base slug first
-        slug = base_slug
-        counter = 1
-        
-        # Keep trying until we find a unique slug
-        while model_class.objects.filter(slug=slug).exists():
-            # Create a new slug with a number suffix
-            slug = f"{base_slug}-{counter}"
-            counter += 1
-            
-        return slug
-
 
     def get_or_create_category(self, name_sr):
         """
@@ -133,10 +104,10 @@ class Command(BaseCommand):
             return None
         
         # Create Latin version
-        name_lat = transliterate_text(name_sr)
+        name_lat = SerbianTextConverter.to_latin(name_sr)
         
         # Generate slug from Latin version
-        slug = self.generate_unique_slug(normalize_text(name_sr), Category)
+        slug = SerbianTextConverter.generate_unique_slug(SerbianTextConverter.normalize(name_sr), Category)
         
         # Create or update with both versions
         category, _ = Category.objects.get_or_create(
@@ -161,14 +132,14 @@ class Command(BaseCommand):
             return None
         
         # Convert to Cyrillic if the input is in Latin
-        if not is_cyrillic(name_sr):
-            name_sr = latin_to_cyrillic(name_sr)
+        if not SerbianTextConverter.is_cyrillic(name_sr):
+            name_sr = SerbianTextConverter.to_cyrillic(name_sr)
         
         # Create Latin version from the (now definitely) Cyrillic name
-        name_lat = transliterate_text(name_sr)
+        name_lat = SerbianTextConverter.to_latin(name_sr)
         
         # Generate slug from Latin version
-        slug = self.generate_unique_slug(normalize_text(name_sr), Executor)
+        slug = SerbianTextConverter.generate_unique_slug(SerbianTextConverter.normalize(name_sr), Executor)
         
         # Create or update with both versions
         executor, _ = Executor.objects.get_or_create(
@@ -197,9 +168,9 @@ class Command(BaseCommand):
         cadastral_municipality_sr = location_data.get('cadastral_municipality', '')
         
         # Transliterate components to Latin
-        municipality_lat = transliterate_text(municipality_sr)
-        city_lat = transliterate_text(city_sr)
-        cadastral_municipality_lat = transliterate_text(cadastral_municipality_sr)
+        municipality_lat = SerbianTextConverter.to_latin(municipality_sr)
+        city_lat = SerbianTextConverter.to_latin(city_sr)
+        cadastral_municipality_lat = SerbianTextConverter.to_latin(cadastral_municipality_sr)
         
         # Create combined titles
         name_parts_sr = [municipality_sr, city_sr, cadastral_municipality_sr]
@@ -209,7 +180,7 @@ class Command(BaseCommand):
         title_lat = ' '.join(filter(None, name_parts_lat))
         
         # Generate slug from Latin version
-        slug = self.generate_unique_slug(normalize_text(title_sr), Location)
+        slug = SerbianTextConverter.generate_unique_slug(SerbianTextConverter.normalize(title_sr), Location)
         
         # Create or update with both versions
         location, _ = Location.objects.get_or_create(
@@ -236,10 +207,10 @@ class Command(BaseCommand):
         for name_sr in tag_names_sr:
             if name_sr:
                 # Create Latin version
-                name_lat = transliterate_text(name_sr)
+                name_lat = SerbianTextConverter.to_latin(name_sr)
                 
                 # Generate slug from Latin version
-                slug = self.generate_unique_slug(normalize_text(name_sr), Tag)
+                slug = SerbianTextConverter.generate_unique_slug(SerbianTextConverter.normalize(name_sr), Tag)
                 
                 # Create or update with both versions
                 tag, _ = Tag.objects.get_or_create(
@@ -266,10 +237,10 @@ class Command(BaseCommand):
         for name_sr in document_names_sr:
             if name_sr not in existing_docs:
                 # Create Latin version
-                name_lat = transliterate_text(name_sr)
+                name_lat = SerbianTextConverter.to_latin(name_sr)
                 
                 # Generate slug from Latin version
-                #slug = self.generate_unique_slug(normalize_text(name_sr), AuctionDocument)
+                #slug = SerbianTextConverter.generate_unique_slug(SerbianTextConverter.normalize(name_sr), AuctionDocument)
                 
                 doc = AuctionDocument.objects.create(
                     title_sr=name_sr,
@@ -463,11 +434,11 @@ class Command(BaseCommand):
             description_sr = data['additional_info'].get('description', '')
             
             # Convert to Latin script using proper Serbian transliteration
-            title_lat = transliterate_text(title_sr)
-            description_lat = transliterate_text(description_sr)
+            title_lat = SerbianTextConverter.to_latin(title_sr)
+            description_lat = SerbianTextConverter.to_latin(description_sr)
             
-            # Generate slug from simplified Latin version (using normalize_text to avoid URL issues)
-            slug = self.generate_unique_slug(normalize_text(title_sr), Auction)
+            # Generate slug from simplified Latin version (using SerbianTextConverter.normalize to avoid URL issues)
+            slug = SerbianTextConverter.generate_unique_slug(SerbianTextConverter.normalize(title_sr), Auction)
             
             # Generate meta fields
             meta_title_sr = f"{title_sr} - еАукција {data['code']}"

@@ -1,6 +1,5 @@
 # views/base_view.py
 from django.views.generic import ListView, DetailView
-from django.views.generic.base import ContextMixin
 from django.db.models import Q
 
 class BreadcrumbMixin:

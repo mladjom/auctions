@@ -1,46 +1,19 @@
 # auctions/content_utils.py
 
-def normalize_text(text):
+class SerbianTextConverter:
     """
-    Normalize text by converting Cyrillic to Latin when needed and handling mixed character sets
+    A utility class for handling Serbian text conversions between Cyrillic and Latin scripts.
     """
-    if not text:
-        return ''
-        
-    cyrillic_to_latin_map = {
-        'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'ђ': 'dj',
-        'е': 'e', 'ж': 'z', 'з': 'z', 'и': 'i', 'ј': 'j', 'к': 'k',
-        'л': 'l', 'љ': 'lj', 'м': 'm', 'н': 'n', 'њ': 'nj', 'о': 'o',
-        'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'ћ': 'c', 'у': 'u',
-        'ф': 'f', 'х': 'h', 'ц': 'c', 'ч': 'c', 'џ': 'dz', 'ш': 's',
-        'А': 'A', 'Б': 'B', 'В': 'V', 'Г': 'G', 'Д': 'D', 'Ђ': 'Dj',
-        'Е': 'E', 'Ж': 'Z', 'З': 'Z', 'И': 'I', 'Ј': 'J', 'К': 'K',
-        'Л': 'L', 'Љ': 'Lj', 'М': 'M', 'Н': 'N', 'Њ': 'Nj', 'О': 'O',
-        'П': 'P', 'Р': 'R', 'С': 'S', 'Т': 'T', 'Ћ': 'C', 'У': 'U',
-        'Ф': 'F', 'Х': 'H', 'Ц': 'C', 'Ч': 'C', 'Џ': 'Dz', 'Ш': 'S'
-    }
     
-    # Check if text contains any Cyrillic characters
-    has_cyrillic = any(char in cyrillic_to_latin_map for char in text)
-    
-    if has_cyrillic:
-        # Convert Cyrillic characters to Latin
-        return ''.join(cyrillic_to_latin_map.get(c, c) for c in text)
-    else:
-        # Text is already in Latin, just return it
-        return text
-    
-def cyrillic_to_latin():
-    """
-    Returns a dictionary mapping Serbian Cyrillic characters to their Latin equivalents.
-    Includes both uppercase and lowercase letters.
-    """
-    return {
+    # Single source of truth for character mappings
+    CYRILLIC_TO_LATIN = {
+        # Uppercase
         'А': 'A', 'Б': 'B', 'В': 'V', 'Г': 'G', 'Д': 'D', 'Ђ': 'Đ', 'Е': 'E',
         'Ж': 'Ž', 'З': 'Z', 'И': 'I', 'Ј': 'J', 'К': 'K', 'Л': 'L', 'Љ': 'Lj',
         'М': 'M', 'Н': 'N', 'Њ': 'Nj', 'О': 'O', 'П': 'P', 'Р': 'R', 'С': 'S',
         'Т': 'T', 'Ћ': 'Ć', 'У': 'U', 'Ф': 'F', 'Х': 'H', 'Ц': 'C', 'Ч': 'Č',
         'Џ': 'Dž', 'Ш': 'Š',
+        # Lowercase
         'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'ђ': 'đ', 'е': 'e',
         'ж': 'ž', 'з': 'z', 'и': 'i', 'ј': 'j', 'к': 'k', 'л': 'l', 'љ': 'lj',
         'м': 'm', 'н': 'n', 'њ': 'nj', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's',
@@ -48,75 +21,154 @@ def cyrillic_to_latin():
         'џ': 'dž', 'ш': 'š'
     }
 
-def transliterate_text(text):
-    """
-    Transliterate Serbian Cyrillic text to Latin script.
-    
-    Args:
-        text (str): Text in Serbian Cyrillic
-        
-    Returns:
-        str: Text converted to Serbian Latin script
-    """
-    mapping = cyrillic_to_latin()
-    result = []
-    i = 0
-    while i < len(text):
-        # Check for special cases (Љ/Њ/Џ)
-        if i + 1 < len(text):
-            two_char = text[i:i+2]
-            if two_char in mapping:
-                result.append(mapping[two_char])
-                i += 2
-                continue
-        
-        # Handle single characters
-        char = text[i]
-        result.append(mapping.get(char, char))
-        i += 1
-        
-    return ''.join(result)
+    # Precompute the reverse mapping for Latin to Cyrillic
+    LATIN_TO_CYRILLIC = {v: k for k, v in CYRILLIC_TO_LATIN.items()}
 
-def is_cyrillic(text):
-    """
-    Check if text contains Cyrillic characters.
-    Returns True if the text contains any Cyrillic characters, False otherwise.
-    """
-    cyrillic_range = range(0x0400, 0x04FF + 1)  # Unicode range for Cyrillic
-    return any(ord(char) in cyrillic_range for char in text)
+    # Special digraphs that need to be handled first
+    LATIN_DIGRAPHS = [
+        ('Lj', 'Љ'), ('lj', 'љ'),
+        ('Nj', 'Њ'), ('nj', 'њ'),
+        ('Dž', 'Џ'), ('dž', 'џ')
+    ]
 
-def latin_to_cyrillic(text):
-    """
-    Convert Serbian Latin text to Cyrillic.
-    This mapping covers Serbian-specific characters.
-    """
-    mapping = {
-        'A': 'А', 'B': 'Б', 'V': 'В', 'G': 'Г', 'D': 'Д', 'Đ': 'Ђ', 'E': 'Е', 
-        'Ž': 'Ж', 'Z': 'З', 'I': 'И', 'J': 'Ј', 'K': 'К', 'L': 'Л', 'Lj': 'Љ',
-        'M': 'М', 'N': 'Н', 'Nj': 'Њ', 'O': 'О', 'P': 'П', 'R': 'Р', 'S': 'С',
-        'T': 'Т', 'Ć': 'Ћ', 'U': 'У', 'F': 'Ф', 'H': 'Х', 'C': 'Ц', 'Č': 'Ч',
-        'Dž': 'Џ', 'Š': 'Ш',
-        'a': 'а', 'b': 'б', 'v': 'в', 'g': 'г', 'd': 'д', 'đ': 'ђ', 'e': 'е',
-        'ž': 'ж', 'z': 'з', 'i': 'и', 'j': 'ј', 'k': 'к', 'l': 'л', 'lj': 'љ',
-        'm': 'м', 'n': 'н', 'nj': 'њ', 'o': 'о', 'p': 'п', 'r': 'р', 's': 'с',
-        't': 'т', 'ć': 'ћ', 'u': 'у', 'f': 'ф', 'h': 'х', 'c': 'ц', 'č': 'ч',
-        'dž': 'џ', 'š': 'ш'
+    # Simplified mapping for URL-safe conversions
+    URL_SAFE_MAPPING = {
+        'đ': 'dj', 'ђ': 'dj', 'ж': 'z', 'з': 'z', 'ћ': 'c',
+        'ц': 'c', 'ч': 'c', 'џ': 'dz', 'ш': 's',
+        'Đ': 'Dj', 'Ж': 'Z', 'З': 'Z', 'Ћ': 'C',
+        'Ц': 'C', 'Ч': 'C', 'Џ': 'Dz', 'Ш': 'S'
     }
+
+    @classmethod
+    def is_cyrillic(cls, text: str) -> bool:
+        """Check if text contains any Cyrillic characters."""
+        if not text:
+            return False
+        return any(char in cls.CYRILLIC_TO_LATIN for char in text)
+
+    @classmethod
+    def is_latin(cls, text: str) -> bool:
+        """Check if text contains any Latin characters."""
+        if not text:
+            return False
+        return any(char in cls.LATIN_TO_CYRILLIC for char in text)
     
-    # Handle special digraphs first
-    text = text.replace('Lj', 'Љ').replace('lj', 'љ')
-    text = text.replace('Nj', 'Њ').replace('nj', 'њ')
-    text = text.replace('Dž', 'Џ').replace('dž', 'џ')
-    
-    # Convert remaining characters
-    result = ''
-    i = 0
-    while i < len(text):
-        char = text[i]
-        if char in mapping:
-            result += mapping[char]
-        else:
-            result += char
-        i += 1
+    @classmethod
+    def to_latin(cls, text: str) -> str:
+        """Convert text from Cyrillic to Latin script."""
+        if not text:
+            return ''
+
+        result = text
+        # Handle digraphs first (if input is Cyrillic)
+        if cls.is_cyrillic(text):
+            return ''.join(cls.CYRILLIC_TO_LATIN.get(char, char) for char in text)
+        return result
+
+    @classmethod
+    def to_cyrillic(cls, text: str) -> str:
+        """Convert text from Latin to Cyrillic script."""
+        if not text:
+            return ''
+
+        result = text
+        # Handle digraphs first
+        for latin, cyrillic in cls.LATIN_DIGRAPHS:
+            result = result.replace(latin, cyrillic)
+
+        # Convert remaining characters
+        return ''.join(cls.LATIN_TO_CYRILLIC.get(char, char) for char in result)
+
+    @classmethod
+    def normalize(cls, text: str) -> str:
+        """
+        Normalize text for URLs and slugs by converting to Latin and simplifying characters.
+        """
+        if not text:
+            return ''
+
+        # First convert to Latin if it's Cyrillic
+        latin_text = cls.to_latin(text)
+
+        # Then apply URL-safe conversions
+        for char, replacement in cls.URL_SAFE_MAPPING.items():
+            latin_text = latin_text.replace(char, replacement)
+
+        return latin_text.lower()
+
+    @staticmethod
+    def generate_unique_slug(source_text: str, model_class, existing_instance=None) -> str:
+        """
+        Generate a unique slug for any Django model instance.
         
-    return result
+        Args:
+            source_text (str): The text to generate the slug from
+            model_class: The Django model class
+            existing_instance: Optional existing model instance (for updates)
+            
+        Returns:
+            str: A unique slug for the model
+        """
+        from django.utils.text import slugify
+        
+        # Handle empty source text
+        if not source_text:
+            base_slug = f"unnamed-{model_class.__name__.lower()}"
+        else:
+            # Normalize and slugify the text
+            normalized_text = SerbianTextConverter.normalize(source_text)
+            base_slug = slugify(normalized_text)
+            
+            if not base_slug:
+                base_slug = f"unnamed-{model_class.__name__.lower()}"
+
+        # If we're updating an existing instance and its slug starts with our base_slug,
+        # we can keep using the same slug
+        if existing_instance and existing_instance.slug.startswith(base_slug):
+            return existing_instance.slug
+
+        # Query existing objects with this base slug
+        existing_slugs = model_class.objects.filter(slug__startswith=base_slug)
+        if existing_instance:
+            existing_slugs = existing_slugs.exclude(pk=existing_instance.pk)
+
+        if not existing_slugs.exists():
+            return base_slug
+
+        # Find the highest number suffix
+        max_suffix = 0
+        for obj in existing_slugs:
+            try:
+                suffix = obj.slug.replace(f"{base_slug}-", "")
+                if suffix.isdigit():
+                    max_suffix = max(max_suffix, int(suffix))
+            except (ValueError, AttributeError):
+                continue
+
+        # Return new slug with incremented suffix
+        return f"{base_slug}-{max_suffix + 1}"
+
+
+
+
+
+# Convenience functions for backward compatibility
+def is_cyrillic(text: str) -> bool:
+    """Backward compatibility function for checking Cyrillic text."""
+    return SerbianTextConverter.is_cyrillic(text)
+
+def is_latin(text: str) -> bool:
+    """Backward compatibility function for checking Latin text."""
+    return SerbianTextConverter.is_latin(text)
+
+def transliterate_text(text: str) -> str:
+    """Backward compatibility function for Cyrillic to Latin conversion."""
+    return SerbianTextConverter.to_latin(text)
+
+def latin_to_cyrillic(text: str) -> str:
+    """Backward compatibility function for Latin to Cyrillic conversion."""
+    return SerbianTextConverter.to_cyrillic(text)
+
+def normalize_text(text: str) -> str:
+    """Backward compatibility function for text normalization."""
+    return SerbianTextConverter.normalize(text)
