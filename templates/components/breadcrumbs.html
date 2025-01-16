@@ -1,15 +1,11 @@
 {# templates/components/breadcrumbs.html #}
-<nav aria-label="breadcrumb" class="py-2">
+<nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-        {% for breadcrumb in breadcrumbs %}
-            {% if not forloop.last %}
-                <li class="breadcrumb-item">
-                    <a href="{{ breadcrumb.url }}">{{ breadcrumb.title }}</a>
-                </li>
+        {% for crumb in breadcrumbs %}
+            {% if crumb.url %}
+                <li class="breadcrumb-item"><a href="{{ crumb.url }}">{{ crumb.title }}</a></li>
             {% else %}
-                <li class="breadcrumb-item active" aria-current="page">
-                    {{ breadcrumb.title }}
-                </li>
+                <li class="breadcrumb-item active" aria-current="page">{{ crumb.title }}</li>
             {% endif %}
         {% endfor %}
     </ol>

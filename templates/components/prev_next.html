@@ -1,0 +1,19 @@
+<nav class="my-4" aria-label="Navigation">
+    <ul class="pagination justify-content-between">
+        {% if previous_object %}
+        <li class="page-item">
+            <a class="page-link" href="{{ previous_object.get_absolute_url }}">
+                &laquo; {{ previous_object.title }}
+            </a>
+        </li>
+        {% endif %}
+        
+        {% if next_object %}
+        <li class="page-item">
+            <a class="page-link" href="{{ next_object.get_absolute_url }}">
+                {{ next_object.title }} &raquo;
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>

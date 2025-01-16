@@ -6,8 +6,8 @@ from ..models import Auction
 class AuctionListView(BaseListView):
     model = Auction
     template_name = 'auctions/auction_list.html'
-    context_object_name = 'auctions'
-    search_fields = ['title', 'description', 'code']
+    #context_object_name = 'auctions'
+    search_fields = ['title', 'description']
     
     def get_queryset(self):
         queryset = super().get_queryset()

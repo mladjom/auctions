@@ -1,0 +1,18 @@
+{% load i18n %}
+<section class="related-content my-4">
+    <h2>{% trans "Povezani sadržaj" %}</h2>
+    <div class="row">
+        {% for obj in related_objects %}
+        <div class="col-md-3 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="card-title h5">
+                        <a href="{{ obj.get_absolute_url }}" class="text-decoration-none">{{ obj.title }}</a>
+                    </h3>
+                    <p class="card-text">{{ obj.description|truncatewords:20 }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>

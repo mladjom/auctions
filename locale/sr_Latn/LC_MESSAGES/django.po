@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VERZIJA PAKETA\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-12 11:44+0100\n"
+"POT-Creation-Date: 2025-01-15 09:35+0100\n"
 "PO-Revision-Date: GODINA-MESEC-DAN ČAS:MIN+ZONA\n"
 "Last-Translator: PUNO IME <EMAIL@ADRESA>\n"
 "Language-Team: JEZIK <LL@li.org>\n"
@@ -23,52 +23,62 @@ msgstr ""
 msgid "Document"
 msgstr "Dokument"
 
-#: auctions/admin/auction_admin.py:10 auctions/models/auction_model.py:80
+#: auctions/admin/auction_admin.py:10 auctions/models/auction_model.py:88
 msgid "Documents"
 msgstr "Dokumenti"
 
-#: auctions/admin/auction_admin.py:18
-#: auctions/models/auction_document_model.py:6
-#: auctions/models/auction_model.py:28 auctions/models/image_model.py:6
+#: auctions/admin/auction_admin.py:17
 msgid "Title"
 msgstr "Naslov"
 
-#: auctions/admin/auction_admin.py:24
-#: auctions/models/auction_document_model.py:7 auctions/models/image_model.py:7
+#: auctions/admin/auction_admin.py:23
+#: auctions/models/auction_document_model.py:6 auctions/models/image_model.py:6
 msgid "File"
 msgstr "Fajl"
 
-#: auctions/admin/auction_admin.py:37
+#: auctions/admin/auction_admin.py:46
 msgid "Basic Information"
 msgstr "Osnovne informacije"
 
-#: auctions/admin/auction_admin.py:40
+#: auctions/admin/auction_admin.py:49
 msgid "Pricing"
 msgstr "Cene"
 
-#: auctions/admin/auction_admin.py:43
+#: auctions/admin/auction_admin.py:52
 msgid "Dates"
 msgstr "Datumi"
 
-#: auctions/admin/auction_admin.py:47
+#: auctions/admin/auction_admin.py:61
 msgid "Relations"
 msgstr "Povezanosti"
 
-#: auctions/admin/auction_admin.py:50
+#: auctions/admin/auction_admin.py:64
 msgid "Additional Information"
 msgstr "Dodatne informacije"
 
-#: auctions/apps.py:7 auctions/models/auction_model.py:89
-#: templates/base.html:11 templates/partials/footer.html:8
+#: auctions/admin/base_admin.py:7
+msgid "Content (Serbian Cyrillic)"
+msgstr ""
+
+#: auctions/admin/base_admin.py:15
+msgid "Content (Serbian Latin)"
+msgstr ""
+
+#: auctions/admin/base_admin.py:23
+msgid "URL and Dates"
+msgstr ""
+
+#: auctions/apps.py:7 auctions/models/auction_model.py:95
+#: templates/base.html:24 templates/partials/footer.html:8
 #: templates/partials/header.html:5
 msgid "Auctions"
 msgstr "Aukcije"
 
-#: auctions/models/auction_document_model.py:16
+#: auctions/models/auction_document_model.py:18
 msgid "Auction Document"
 msgstr "Dokument aukcije"
 
-#: auctions/models/auction_document_model.py:17
+#: auctions/models/auction_document_model.py:19
 msgid "Auction Documents"
 msgstr "Dokumenti aukcije"
 
@@ -77,159 +87,165 @@ msgid "Потврђивање у току"
 msgstr "Potvrđivanje u toku"
 
 #: auctions/models/auction_model.py:15
-msgid "ПОТВРЂИВАЊЕ У ТОКУ"
-msgstr "POTVRĐIVANJE U TOKU"
-
-#: auctions/models/auction_model.py:16
 msgid "Потврђено"
 msgstr "Potvrđeno"
 
-#: auctions/models/auction_model.py:17
-msgid "ПОТВРЂЕНО"
-msgstr "POTVRĐENO"
-
-#: auctions/models/auction_model.py:21
+#: auctions/models/auction_model.py:19
 msgid "Code"
 msgstr "Kod"
 
-#: auctions/models/auction_model.py:26
+#: auctions/models/auction_model.py:24
 msgid "Status"
 msgstr "Status"
 
-#: auctions/models/auction_model.py:29
+#: auctions/models/auction_model.py:26
 msgid "URL"
 msgstr "URL"
 
-#: auctions/models/auction_model.py:32
+#: auctions/models/auction_model.py:29
 msgid "Publication Date"
 msgstr "Datum objavljivanja"
 
-#: auctions/models/auction_model.py:33
+#: auctions/models/auction_model.py:30
 msgid "Start Time"
 msgstr "Vreme početka"
 
-#: auctions/models/auction_model.py:34
+#: auctions/models/auction_model.py:31
 msgid "End Time"
 msgstr "Vreme završetka"
 
-#: auctions/models/auction_model.py:37
+#: auctions/models/auction_model.py:35
 msgid "Starting Price"
 msgstr "Početna cena"
 
-#: auctions/models/auction_model.py:38
+#: auctions/models/auction_model.py:40
 msgid "Estimated Value"
 msgstr "Procenjena vrednost"
 
-#: auctions/models/auction_model.py:39
+#: auctions/models/auction_model.py:45
 msgid "Bidding Step"
 msgstr "Korak licitiranja"
 
-#: auctions/models/auction_model.py:42 auctions/models/category_model.py:8
-msgid "Description"
-msgstr "Opis"
-
-#: auctions/models/auction_model.py:43
+#: auctions/models/auction_model.py:51
 msgid "Sale Number"
 msgstr "Broj prodaje"
 
-#: auctions/models/auction_model.py:48 auctions/models/location_model.py:15
+#: auctions/models/auction_model.py:56 auctions/models/location_model.py:15
 msgid "Location"
 msgstr "Lokacija"
 
-#: auctions/models/auction_model.py:54 auctions/models/category_model.py:13
+#: auctions/models/auction_model.py:62 auctions/models/category_model.py:10
 msgid "Category"
 msgstr "Kategorija"
 
-#: auctions/models/auction_model.py:61 auctions/models/executor_model.py:16
+#: auctions/models/auction_model.py:69 auctions/models/executor_model.py:14
 msgid "Executor"
 msgstr "Izvršilac"
 
-#: auctions/models/auction_model.py:68 auctions/models/tag_model.py:14
+#: auctions/models/auction_model.py:76 auctions/models/tag_model.py:8
 msgid "Tags"
 msgstr "Oznake"
 
-#: auctions/models/auction_model.py:74 auctions/models/image_model.py:18
+#: auctions/models/auction_model.py:82 auctions/models/image_model.py:21
 msgid "Images"
 msgstr "Slike"
 
-#: auctions/models/auction_model.py:88
+#: auctions/models/auction_model.py:94
 #, fuzzy
 #| msgid "Auctions"
 msgid "Auction"
 msgstr "Aukcija"
 
-#: auctions/models/base_model.py:9 auctions/models/tag_model.py:8
-msgid "Slug"
+#: auctions/models/base_model.py:11
+msgid "Title (Cyrillic)"
 msgstr ""
 
-#: auctions/models/base_model.py:10
-#, fuzzy
-#| msgid "Title"
-msgid "Meta Title"
-msgstr "Naslov"
-
-#: auctions/models/base_model.py:11
-#, fuzzy
-#| msgid "Description"
-msgid "Meta Description"
-msgstr "Opis"
-
 #: auctions/models/base_model.py:12
-msgid "Created at"
+msgid "Title (Latin)"
 msgstr ""
 
 #: auctions/models/base_model.py:13
+#, fuzzy
+#| msgid "Description"
+msgid "Description (Cyrillic)"
+msgstr "Opis"
+
+#: auctions/models/base_model.py:14
+#, fuzzy
+#| msgid "Description"
+msgid "Description (Latin)"
+msgstr "Opis"
+
+#: auctions/models/base_model.py:17
+#, fuzzy
+#| msgid "Title"
+msgid "Meta Title (Cyrillic)"
+msgstr "Naslov"
+
+#: auctions/models/base_model.py:18
+#, fuzzy
+#| msgid "Title"
+msgid "Meta Title (Latin)"
+msgstr "Naslov"
+
+#: auctions/models/base_model.py:19
+#, fuzzy
+#| msgid "Description"
+msgid "Meta Description (Cyrillic)"
+msgstr "Opis"
+
+#: auctions/models/base_model.py:20
+#, fuzzy
+#| msgid "Description"
+msgid "Meta Description (Latin)"
+msgstr "Opis"
+
+#: auctions/models/base_model.py:23
+msgid "Slug"
+msgstr ""
+
+#: auctions/models/base_model.py:24
+msgid "Created at"
+msgstr ""
+
+#: auctions/models/base_model.py:25
 msgid "Updated at"
 msgstr ""
 
-#: auctions/models/base_model.py:66
-#, python-format
-msgid "Explore more about %(slug)s."
-msgstr ""
-
-#: auctions/models/category_model.py:7 auctions/models/executor_model.py:8
-#: auctions/models/tag_model.py:7
-msgid "Name"
-msgstr ""
-
-#: auctions/models/category_model.py:14 templates/partials/footer.html:9
+#: auctions/models/category_model.py:11 templates/partials/footer.html:9
 #: templates/partials/header.html:22
-#, fuzzy
-#| msgid "Category"
 msgid "Categories"
 msgstr "Kategorije"
 
-#: auctions/models/executor_model.py:9 templates/partials/footer.html:17
+#: auctions/models/executor_model.py:8 templates/partials/footer.html:17
 msgid "Email"
 msgstr ""
 
-#: auctions/models/executor_model.py:10 templates/partials/footer.html:18
+#: auctions/models/executor_model.py:9 templates/partials/footer.html:18
 msgid "Phone"
-msgstr ""
+msgstr "Telefon"
 
-#: auctions/models/executor_model.py:11
+#: auctions/models/executor_model.py:10
 #, fuzzy
 #| msgid "Auctions"
 msgid "Jurisdiction"
 msgstr "Aukcije"
 
-#: auctions/models/executor_model.py:17 templates/partials/header.html:32
-#, fuzzy
-#| msgid "Executor"
+#: auctions/models/executor_model.py:15 templates/partials/header.html:32
 msgid "Executors"
 msgstr "Izvršioci"
 
-#: auctions/models/image_model.py:8
+#: auctions/models/image_model.py:7
 msgid "Alt text"
 msgstr ""
 
-#: auctions/models/image_model.py:9
+#: auctions/models/image_model.py:8
 #, fuzzy
 #| msgid "Location"
 msgid "Caption"
 msgstr "Lokacija"
 
-#: auctions/models/image_model.py:17
+#: auctions/models/image_model.py:20
 #, fuzzy
 #| msgid "Images"
 msgid "Image"
@@ -254,15 +270,11 @@ msgstr ""
 msgid "Locations"
 msgstr "Lokacije"
 
-#: auctions/models/tag_model.py:13
+#: auctions/models/tag_model.py:7
 #, fuzzy
 #| msgid "Tags"
 msgid "Tag"
 msgstr "Oznaka"
-
-#: config/settings/base.py:107
-msgid "English"
-msgstr ""
 
 #: templates/admin/base_site.html:3
 msgid "Django blog admin"
@@ -284,7 +296,7 @@ msgstr ""
 msgid "Search executors..."
 msgstr ""
 
-#: templates/base.html:12
+#: templates/base.html:25
 msgid "Online auction platform"
 msgstr ""
 
@@ -324,14 +336,20 @@ msgstr ""
 msgid "All Auctions"
 msgstr "Sve aukcije"
 
-#: templates/partials/header.html:65
+#: templates/partials/header.html:62
 msgid "Admin Panel"
 msgstr ""
 
-#: templates/partials/header.html:71
+#: templates/partials/header.html:68
 msgid "Logout"
 msgstr ""
 
-#: templates/partials/header.html:78
+#: templates/partials/header.html:75
 msgid "Login"
 msgstr ""
+
+#~ msgid "ПОТВРЂИВАЊЕ У ТОКУ"
+#~ msgstr "POTVRĐIVANJE U TOKU"
+
+#~ msgid "ПОТВРЂЕНО"
+#~ msgstr "POTVRĐENO"

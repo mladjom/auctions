@@ -90,6 +90,8 @@ class Auction(BaseModel):
         related_name='auctions'
     )
 
+    view_count = None
+
     class Meta:
         verbose_name = _("Auction")
         verbose_name_plural = _("Auctions")
@@ -103,8 +105,8 @@ class Auction(BaseModel):
     def __str__(self):
         return f"{self.code} - {self.title_sr}"
 
-    def is_active(self):
-        return self.status == 'CONFIRMED'
+    # def is_active(self):
+    #     return self.status == 'CONFIRMED'
 
     def get_absolute_url(self):
         return reverse('auctions:auction-detail', args=[str(self.slug)])

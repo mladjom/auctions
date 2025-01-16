@@ -1,10 +1,8 @@
-# auctions/models/base_model.py
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.utils.text import slugify
-from auctions.utils.content_utils import SerbianTextConverter
-from django.utils import timezone
 from django.utils.translation import get_language
+from django.db.models import F
+from auctions.utils.content_utils import SerbianTextConverter
 
 class BaseModel(models.Model):
     # Core fields in both scripts
@@ -23,31 +21,38 @@ class BaseModel(models.Model):
     slug = models.SlugField(max_length=255, unique=True, verbose_name=_('Slug'))
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
+    view_count = models.PositiveIntegerField(default=0, editable=False)
+    is_active = models.BooleanField(_("Active"), default=True)
 
     class Meta:
         abstract = True
-        
-    def get_absolute_url(self):
-        """
-        Override this method in subclasses for proper URL resolution.
-        """
-        raise NotImplementedError("Subclasses must implement `get_absolute_url`")
+        ordering = ['-created_at']
 
-    def get_slug_source(self):
-        if hasattr(self, 'source_field'):
-            source_value = getattr(self, self.source_field)
-            if source_value:
-                return source_value
-        return f"{self.__class__.__name__.lower()}-{timezone.now().timestamp()}"
+    def get_absolute_url(self):
+        if not self.slug:
+            raise ValueError("Slug not generated for this object.")
+        return f"/{self.__class__.__name__.lower()}s/{self.slug}/"
+
+    def get_schema_data(self):
+        return {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": self.title,
+            "description": self.description,
+            "inLanguage": "sr" if get_language() == 'sr' else "sr-Latn",
+            "datePublished": self.created_at.isoformat(),
+            "dateModified": self.updated_at.isoformat(),
+            "url": self.canonical_url
+        }
+
+    def increment_view_count(self):
+        self.__class__.objects.filter(pk=self.pk).update(view_count=F('view_count') + 1)
 
     @property
     def canonical_url(self):
-        """
-        Generate a canonical URL based on the model's class name and slug.
-        """
-        return f"/{self.__class__.__name__.lower()}s/{self.slug}/"            
-    
-        
+        return self.get_absolute_url()
+
+
     def save(self, *args, **kwargs):
         # Auto-generate Latin versions if not provided
         if not self.title_lat and self.title_sr:
@@ -71,18 +76,18 @@ class BaseModel(models.Model):
 
     @property
     def title(self):
-        return self.title_lat if get_language() == 'sr-Latn' else self.title_sr
+        return self.title_sr if get_language() == 'sr' else self.title_lat
 
     @property
     def description(self):
-        return self.description_lat if get_language() == 'sr-Latn' else self.description_sr
+        return self.description_sr if get_language() == 'sr' else self.description_lat
 
     @property
     def meta_title(self):
-        current_title = self.meta_title_lat if get_language() == 'sr-Latn' else self.meta_title_sr
+        current_title = self.meta_title_sr if get_language() == 'sr' else self.meta_title_lat
         return current_title or self.title
 
     @property
     def meta_description(self):
-        current_desc = self.meta_description_lat if get_language() == 'sr-Latn' else self.meta_description_sr
+        current_desc = self.meta_description_sr if get_language() == 'sr' else self.meta_description_lat
         return current_desc or self.description[:160]

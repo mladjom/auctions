@@ -13,7 +13,8 @@ class AuctionDocument(BaseModel):
     meta_title_lat = None  # Remove the meta_description field    
     meta_description_sr = None  # Remove the meta_description field    
     meta_description_lat = None  # Remove the meta_description field    
-    
+    is_active = None 
+    view_count = None
     class Meta:
         verbose_name = _("Auction Document")
         verbose_name_plural = _("Auction Documents")
