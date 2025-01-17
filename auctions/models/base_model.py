@@ -52,7 +52,6 @@ class BaseModel(models.Model):
     def canonical_url(self):
         return self.get_absolute_url()
 
-
     def save(self, *args, **kwargs):
         # Auto-generate Latin versions if not provided
         if not self.title_lat and self.title_sr:

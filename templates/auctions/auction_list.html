@@ -1,55 +1,77 @@
 {# templates/auctions/auction_list.html #}
 {% extends "base.html" %}
-{% block meta_tags %}
-    <title>{{ meta_title }}</title>
-    <meta name="description" content="{{ meta_description }}">
-{% endblock %}
-{% block content %}
-    {% include "../components/breadcrumbs.html" %}  
-    <div class="container">
-        <h1 class="mb-4">Auctions</h1>
-        
-        <div class="row mb-4">
-            <div class="col-md-8">
-                {% include "../components/search_form.html" with search_placeholder=_("Search auctions...") %}
+{% load i18n %}
 
-            </div>
-            <div class="col-md-4">
-                <div class="text-end">
-                    <p>Active auctions: {{ active_auctions }}</p>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            {% for auction in objects %}
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100">
-                        {% if auction.images.first %}
-                            <img src="{{ auction.images.first.file.url }}" 
-                                 class="card-img-top" 
-                                 alt="{{ auction.images.first.alt_text }}">
-                        {% endif %}
-                        <div class="card-body">
-                            <h5 class="card-title">{{ auction.title }}</h5>
-                            <p class="card-text">{{ auction.description|truncatewords:30 }}</p>
-                            <p class="card-text">
-                                <small class="text-muted">
-                                    Starting price: €{{ auction.starting_price }}
-                                </small>
-                            </p>
-                           <a href="{{ auction.get_absolute_url }}" 
-                               class="btn btn-primary">View Details</a> 
+
+{% block content %}
+<div class="space-y-8">
+    {# Page Header #}
+    <div class="flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-gray-900">{% trans "Auctions" %}</h1>
+        <p class="text-gray-600">{% trans "Active Auctions:" %} {{ active_auctions }}</p>
+    </div>
+    {% include "../components/search.html" with search_placeholder=_("Search articles...") %}
+
+
+    {# Auction List #}
+    {% if object_list %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for auction in object_list %}
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    {% if auction.image %}
+                        <img src="{{ auction.image.url }}" alt="{{ auction.title }}" class="w-full h-48 object-cover">
+                    {% else %}
+                        <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+                            <span class="text-gray-400">{% trans "No Image" %}</span>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="p-6 space-y-4">
+                        <h2 class="text-xl font-bold text-gray-900">
+                            <a href="{{ auction.get_absolute_url }}" class="hover:text-blue-600">
+                                {{ auction.title }}
+                            </a>
+                        </h2>
+                        
+                        <p class="text-gray-600 line-clamp-2">{{ auction.description }}</p>
+                        
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-500">
+                                {% trans "Startting Price:" %} <span class="font-bold text-gray-900"> {{ auction.starting_price }}</span>
+                            </span>
+                            <span class="text-gray-500">
+                                {% trans "Estimated Value:" %} {{ auction.estimated_value }}
+                            </span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-500">
+                                {% if auction.is_active %}
+                                    {% trans "Starts in:" %} {{ auction.start_time }}
+                                {% else %}
+                                    {% trans "Ended:" %} {{ auction.end_time|date:"M d, Y" }}
+                                {% endif %}
+                            </span>
+                            <span class="px-3 py-1 rounded-full text-xs font-medium
+                                {% if auction.status == 'active' %}
+                                    bg-green-100 text-green-800
+                                {% elif auction.status == 'ending-soon' %}
+                                    bg-yellow-100 text-yellow-800
+                                {% else %}
+                                    bg-gray-100 text-gray-800
+                                {% endif %}">
+                                {{ auction.get_status_display }}
+                            </span>
                         </div>
                     </div>
                 </div>
-            {% empty %}
-                <div class="col">
-                    <p>No auctions found.</p>
-                </div>
             {% endfor %}
         </div>
-        {% if is_paginated %}
-            {% include "../components/pagination.html" %}
-        {% endif %}
-    </div>
+    {% else %}
+        <div class="text-center py-12">
+            <h3 class="text-xl text-gray-600">{% trans "No auctions found matching your criteria." %}</h3>
+            <p class="mt-2 text-gray-500">{% trans "Try adjusting your search or filters." %}</p>
+        </div>
+    {% endif %}
+</div>
 {% endblock %}

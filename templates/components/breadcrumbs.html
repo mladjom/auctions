@@ -1,12 +1,24 @@
 {# templates/components/breadcrumbs.html #}
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        {% for crumb in breadcrumbs %}
-            {% if crumb.url %}
-                <li class="breadcrumb-item"><a href="{{ crumb.url }}">{{ crumb.title }}</a></li>
-            {% else %}
-                <li class="breadcrumb-item active" aria-current="page">{{ crumb.title }}</li>
-            {% endif %}
+{% load i18n %}
+<nav aria-label="{% trans 'Breadcrumb' %}" class="bg-gray-50">
+    <ol class="flex max-w-screen-xl space-x-4  py-3">
+        {% for breadcrumb in breadcrumbs %}
+            <li class="flex items-center">
+                {% if not forloop.first %}
+                    <svg class="h-5 w-5 flex-shrink-0 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+                    </svg>
+                {% endif %}
+                {% if breadcrumb.url %}
+                    <a href="{{ breadcrumb.url }}" 
+                       class="{% if forloop.first %}text-gray-500{% else %}ml-4 text-gray-600{% endif %} hover:text-gray-900"
+                       {% if not forloop.last %}aria-current="false"{% else %}aria-current="page"{% endif %}>
+                        {{ breadcrumb.title }}
+                    </a>
+                {% else %}
+                    <span class="ml-4 text-gray-900">{{ breadcrumb.title }}</span>
+                {% endif %}
+            </li>
         {% endfor %}
     </ol>
 </nav>

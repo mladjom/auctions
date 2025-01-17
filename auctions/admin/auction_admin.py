@@ -44,7 +44,7 @@ class AuctionAdmin(BaseModelAdmin):
         # Add additional fieldsets specific to AuctionAdmin as a tuple
         additional_fieldsets = (
             (_('Basic Information'), {
-                'fields': ('code', 'status', 'url')
+                'fields': ('code', 'status', 'url', 'is_active')
             }),
             (_('Pricing'), {
                 'fields': ('starting_price', 'estimated_value', 'bidding_step')

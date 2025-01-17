@@ -13,6 +13,7 @@ class Auction(BaseModel):
     STATUS_CHOICES = [
         ('CONFIRMATION_IN_PROGRESS', _('Потврђивање у току')),
         ('CONFIRMED', _('Потврђено')),
+        ('EXPIRED', _('Истекло')),
     ]
 
     # Basic information

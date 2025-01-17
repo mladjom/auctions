@@ -1,80 +1,113 @@
 {% load i18n %}
-<header class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container">
-        <a class="navbar-brand" href="{% url 'auctions:auction-list' %}">
-            {% trans "Auctions" %}
-        </a>
-        
-        <button class="navbar-toggler" type="button" 
-                data-bs-toggle="collapse" data-bs-target="#navbarMain">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        
-        <div class="collapse navbar-collapse" id="navbarMain">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'auctions:auction-list' %}">
-                        {% trans "All Auctions" %}
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'auctions:category-list' %}">
-                        {% trans "Categories" %}
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'auctions:location-list' %}">
-                        {% trans "Locations" %}
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'auctions:executor-list' %}">
-                        {% trans "Executors" %}
-                    </a>
-                </li>
-                <li>
-                    {{ LANGUAGE_CODE }}
-                </li>
-            </ul>
-            <form method="post" action="{% url 'set_language' %}" class="d-flex me-3">
-                {% csrf_token %}
-                <select name="language" class="form-select" onchange="this.form.submit()">
-                {% get_current_language as LANGUAGE_CODE %}
-                {% get_available_languages as LANGUAGES %}
-                {% for lang_code, lang_name in LANGUAGES %}
-                    <option value="{{ lang_code }}" {% if lang_code.lower == LANGUAGE_CODE.lower %}selected{% endif %}>
-                    {{ lang_name }}
-                    </option>
-                {% endfor %}
-                </select>
-            </form>
-            {# User Menu #}
-            {% if user.is_authenticated %}
-                <div class="dropdown">
-                    <button class="btn btn-light dropdown-toggle" type="button" 
-                            data-bs-toggle="dropdown">
-                        {{ user.username }}
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        {% if user.is_staff %}
-                            <li>
-                                <a class="dropdown-item" href="{% url 'admin:index' %}">
-                                    {% trans "Admin Panel" %}
-                                </a>
-                            </li>
-                        {% endif %}
-                        <li>
-                            <a class="dropdown-item" href="{% url 'logout' %}">
-                                {% trans "Logout" %}
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            {% else %}
-                <a href="{% url 'login' %}" class="btn btn-light">
-                    {% trans "Login" %}
+<header class="bg-white shadow-sm">
+    <nav class="container mx-auto px-4 py-4">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+            <!-- Logo/Brand -->
+            <div class="flex items-center justify-between">
+                <a href="{% url 'auctions:auction-list' %}" class="text-xl font-bold text-gray-800">
+                    {% trans "Auctions" %}
                 </a>
-            {% endif %}
+                <!-- Mobile menu button -->
+                <button type="button" 
+                        class="lg:hidden rounded-md p-2 text-gray-600 hover:text-gray-900 focus:outline-none"
+                        onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden lg:hidden mt-4 space-y-2">
+                <a href="{% url 'auctions:auction-list' %}" class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md">
+                    {% trans "All Auctions" %}
+                </a>
+                <a href="{% url 'auctions:category-list' %}" class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md">
+                    {% trans "Categories" %}
+                </a>
+                <a href="{% url 'auctions:location-list' %}" class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md">
+                    {% trans "Locations" %}
+                </a>
+                <a href="{% url 'auctions:executor-list' %}" class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md">
+                    {% trans "Executors" %}
+                </a>
+            </div>
+
+            <!-- Desktop Navigation -->
+            <div class="hidden lg:flex lg:items-center lg:space-x-6">
+                <a href="{% url 'auctions:auction-list' %}" class="text-gray-600 hover:text-gray-900 transition-colors">
+                    {% trans "All Auctions" %}
+                </a>
+                <a href="{% url 'auctions:category-list' %}" class="text-gray-600 hover:text-gray-900 transition-colors">
+                    {% trans "Categories" %}
+                </a>
+                <a href="{% url 'auctions:location-list' %}" class="text-gray-600 hover:text-gray-900 transition-colors">
+                    {% trans "Locations" %}
+                </a>
+                <a href="{% url 'auctions:executor-list' %}" class="text-gray-600 hover:text-gray-900 transition-colors">
+                    {% trans "Executors" %}
+                </a>
+            </div>
+
+            <!-- Right Side - User Menu & Language -->
+            <div class="hidden lg:flex items-center space-x-4">
+                <!-- Language Selector -->
+                <form method="post" action="{% url 'set_language' %}" class="inline-block">
+                    {% csrf_token %}
+                    <select name="language" 
+                            onchange="this.form.submit()"
+                            class="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm">
+                        {% get_current_language as LANGUAGE_CODE %}
+                        {% get_available_languages as LANGUAGES %}
+                        {% for lang_code, lang_name in LANGUAGES %}
+                            <option value="{{ lang_code }}" 
+                                    {% if lang_code.lower == LANGUAGE_CODE.lower %}selected{% endif %}>
+                                {{ lang_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </form>
+
+                <!-- User Menu -->
+                {% if user.is_authenticated %}
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" 
+                                @click.away="open = false"
+                                class="flex items-center space-x-1 text-gray-600 hover:text-gray-900">
+                            <span>{{ user.username }}</span>
+                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        <div x-show="open" 
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="transform opacity-0 scale-95"
+                             x-transition:enter-end="transform opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-75"
+                             x-transition:leave-start="transform opacity-100 scale-100"
+                             x-transition:leave-end="transform opacity-0 scale-95"
+                             class="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                            <div class="py-1">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    {% trans "Profile" %}
+                                </a>
+                                {% if user.is_staff %}
+                                    <a href="{% url 'admin:index' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        {% trans "Admin Panel" %}
+                                    </a>
+                                {% endif %}
+                                <a href="{% url 'logout' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    {% trans "Logout" %}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{% url 'login' %}" class="text-gray-600 hover:text-gray-900 transition-colors">
+                        {% trans "Login" %}
+                    </a>
+                {% endif %}
+            </div>
         </div>
-    </div>
+    </nav>
 </header>

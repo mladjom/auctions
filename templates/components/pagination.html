@@ -1,27 +1,24 @@
-<nav aria-label="Page navigation" class="mt-4">
-    <ul class="pagination justify-content-center">
+{% load i18n %}
+<div class="mt-8 flex justify-center">
+    <nav class="inline-flex rounded-md shadow">
         {% if page_obj.has_previous %}
-            <li class="page-item">
-                <a class="page-link" 
-                   href="?page={{ page_obj.previous_page_number }}">
-                    Previous
-                </a>
-            </li>
+        <a href="?page={{ page_obj.previous_page_number }}" 
+           class="px-3 py-2 bg-white border border-gray-300 rounded-l-md hover:bg-gray-50">
+            {% trans "Previous" %}
+        </a>
         {% endif %}
 
-        {% for num in page_obj.paginator.page_range %}
-            <li class="page-item {% if page_obj.number == num %}active{% endif %}">
-                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-            </li>
-        {% endfor %}
+        <span class="px-3 py-2 bg-white border-t border-b border-gray-300">
+            {% blocktrans with current_page=page_obj.number total_pages=paginator.num_pages %}
+                Page {{ current_page }} of {{ total_pages }}
+            {% endblocktrans %}
+        </span>
 
         {% if page_obj.has_next %}
-            <li class="page-item">
-                <a class="page-link" 
-                   href="?page={{ page_obj.next_page_number }}">
-                    Next
-                </a>
-            </li>
+        <a href="?page={{ page_obj.next_page_number }}" 
+           class="px-3 py-2 bg-white border border-gray-300 rounded-r-md hover:bg-gray-50">
+            {% trans "Next" %}
+        </a>
         {% endif %}
-    </ul>
-</nav>
+    </nav>
+</div>

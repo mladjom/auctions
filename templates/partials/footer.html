@@ -1,39 +1,29 @@
-{% load i18n %}
-<footer class="footer mt-auto py-3 bg-light">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-4">
-                <h5>{% trans "Quick Links" %}</h5>
-                <ul class="list-unstyled">
-                    <li><a href="{% url 'auctions:auction-list' %}">{% trans "Auctions" %}</a></li>
-                    <li><a href="{% url 'auctions:category-list' %}">{% trans "Categories" %}</a></li>
-                    <li><a href="{% url 'auctions:location-list' %}">{% trans "Locations" %}</a></li>
+<footer class="bg-gray-800 text-white mt-16">
+    <div class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+                <h3 class="text-lg font-bold mb-4">About Us</h3>
+                <p class="text-gray-300">Your trusted platform for online auctions.</p>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold mb-4">Quick Links</h3>
+                <ul class="space-y-2">
+                    <li><a href="#" class="text-gray-300 hover:text-white">About</a></li>
+                    <li><a href="{% url 'contact' %}" class="text-gray-300 hover:text-white">Contact</a></li>
+                    <li><a href="{% url 'terms' %}" class="text-gray-300 hover:text-white">Terms</a></li>
+                    <li><a href="{% url 'privacy' %}" class="text-gray-300 hover:text-white">Privacy</a></li>
                 </ul>
             </div>
-            <div class="col-md-4">
-                <h5>{% trans "Contact" %}</h5>
-                <address>
-                    <strong>{% trans "Auctions Platform" %}</strong><br>
-                    {% trans "Email" %}: info@example.com<br>
-                    {% trans "Phone" %}: +1234567890
-                </address>
-            </div>
-            <div class="col-md-4">
-                <h5>{% trans "Follow Us" %}</h5>
-                <div class="social-links">
-                    <a href="#" class="me-2">Facebook</a>
-                    <a href="#" class="me-2">Twitter</a>
-                    <a href="#">LinkedIn</a>
-                </div>
+            <div>
+                <h3 class="text-lg font-bold mb-4">Contact</h3>
+                <ul class="space-y-2 text-gray-300">
+                    <li>Email: contact@example.com</li>
+                    <li>Phone: (123) 456-7890</li>
+                </ul>
             </div>
         </div>
-        <hr>
-        <div class="text-center">
-            <small class="text-muted">
-                {% blocktrans with year=current_year %}
-                    © {{ year }} Auctions Platform. All rights reserved.
-                {% endblocktrans %}
-            </small>
+        <div class="mt-8 pt-8 border-t border-gray-700 text-center text-gray-400">
+            <p>&copy; {% now "Y" %} Auction Site. All rights reserved.</p>
         </div>
     </div>
 </footer>
