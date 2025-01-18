@@ -11,18 +11,24 @@
     
     {# Meta Tags #}
     <meta name="description" content="{% block meta_description %}{{ meta_description }}{% endblock %}">
+    {% if canonical_url %}
     <link rel="canonical" href="{{ canonical_url }}">
+    {% endif %}
     
     {# Alternate Language URLs #}
+    {% if alternate_sr %}
     <link rel="alternate" hreflang="sr" href="{{ alternate_sr }}">
+    {% endif %}
+    {% if alternate_lat %}
     <link rel="alternate" hreflang="sr-Latn" href="{{ alternate_lat }}">
+    {% endif %}
     
     {# Open Graph Tags #}
     {% block og_tags %}
     <meta property="og:title" content="{% if og_title %}{{ og_title }}{% else %}{{ meta_title }}{% endif %}">
     <meta property="og:description" content="{% if og_description %}{{ og_description }}{% else %}{{ meta_description }}{% endif %}">
     <meta property="og:type" content="{{ og_type|default:'website' }}">
-    <meta property="og:url" content="{{ og_url|default:canonical_url }}">
+    <meta property="og:url" content="{{ canonical_url|default:request.build_absolute_uri }}">
     {% endblock %}
     
     {# Schema Data #}

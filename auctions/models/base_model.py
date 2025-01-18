@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.translation import get_language
 from django.db.models import F
 from auctions.utils.content_utils import SerbianTextConverter
+from django.urls import reverse
 
 class BaseModel(models.Model):
     # Core fields in both scripts
@@ -28,25 +29,35 @@ class BaseModel(models.Model):
         abstract = True
         ordering = ['-created_at']
 
+    def __str__(self):
+        return self.title
+    
     def get_absolute_url(self):
-        if not self.slug:
-            raise ValueError("Slug not generated for this object.")
-        return f"/{self.__class__.__name__.lower()}s/{self.slug}/"
-
-    def get_schema_data(self):
-        return {
-            "@context": "https://schema.org",
-            "@type": "WebPage",
-            "name": self.title,
-            "description": self.description,
-            "inLanguage": "sr" if get_language() == 'sr' else "sr-Latn",
-            "datePublished": self.created_at.isoformat(),
-            "dateModified": self.updated_at.isoformat(),
-            "url": self.canonical_url
-        }
-
+        """Get the absolute URL for the object"""
+        return reverse(f"{self._meta.app_label}:{self._meta.model_name}-detail", 
+                      kwargs={'slug': self.slug})
+    
     def increment_view_count(self):
+        """Increment the view count atomically"""
         self.__class__.objects.filter(pk=self.pk).update(view_count=F('view_count') + 1)
+
+    @property
+    def title(self):
+        return self.title_sr if get_language() == 'sr' else self.title_lat
+
+    @property
+    def description(self):
+        return self.description_sr if get_language() == 'sr' else self.description_lat
+
+    @property
+    def meta_title(self):
+        current_title = self.meta_title_sr if get_language() == 'sr' else self.meta_title_lat
+        return current_title or self.title
+
+    @property
+    def meta_description(self):
+        current_desc = self.meta_description_sr if get_language() == 'sr' else self.meta_description_lat
+        return current_desc or self.description[:160]
 
     @property
     def canonical_url(self):
@@ -73,20 +84,16 @@ class BaseModel(models.Model):
 
         super().save(*args, **kwargs)
 
-    @property
-    def title(self):
-        return self.title_sr if get_language() == 'sr' else self.title_lat
 
-    @property
-    def description(self):
-        return self.description_sr if get_language() == 'sr' else self.description_lat
-
-    @property
-    def meta_title(self):
-        current_title = self.meta_title_sr if get_language() == 'sr' else self.meta_title_lat
-        return current_title or self.title
-
-    @property
-    def meta_description(self):
-        current_desc = self.meta_description_sr if get_language() == 'sr' else self.meta_description_lat
-        return current_desc or self.description[:160]
+    def get_schema_data(self):
+        """Get schema.org structured data"""
+        return {
+            "@context": "https://schema.org",
+            "@type": "CreativeWork",
+            "name": self.title,
+            "description": self.description,
+            "inLanguage": "sr" if get_language() == 'sr' else "sr-Latn",
+            "datePublished": self.created_at.isoformat(),
+            "dateModified": self.updated_at.isoformat(),
+            "url": self.get_absolute_url()
+        } 

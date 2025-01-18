@@ -8,6 +8,7 @@ from .location_model import Location
 from .image_model import Image
 from .auction_document_model import AuctionDocument
 from django.urls import reverse
+from django.utils import timezone
 
 class Auction(BaseModel):
     STATUS_CHOICES = [
@@ -59,12 +60,11 @@ class Auction(BaseModel):
         related_name='auctions'
     )
     category = models.ForeignKey(
-        Category,
-        verbose_name=_("Category"),
-        on_delete=models.SET_NULL,
-        null=True,
+        Category, 
+        on_delete=models.PROTECT, 
         related_name='auctions'
     )
+    
     executor = models.ForeignKey(
         Executor,
         verbose_name=_("Executor"),
@@ -91,8 +91,6 @@ class Auction(BaseModel):
         related_name='auctions'
     )
 
-    view_count = None
-
     class Meta:
         verbose_name = _("Auction")
         verbose_name_plural = _("Auctions")
@@ -106,8 +104,32 @@ class Auction(BaseModel):
     def __str__(self):
         return f"{self.code} - {self.title_sr}"
 
-    # def is_active(self):
-    #     return self.status == 'CONFIRMED'
-
-    def get_absolute_url(self):
-        return reverse('auctions:auction-detail', args=[str(self.slug)])
+    @property
+    def is_active(self):
+        """Check if auction is currently active"""
+        now = timezone.now()
+        return (
+            self.status == 'CONFIRMED' and 
+            self.start_time <= now and 
+            self.end_time > now
+        )
+    
+    def get_schema_data(self):
+        """Override schema data for auctions"""
+        base_schema = super().get_schema_data()
+        base_schema.update({
+            "@type": "AuctionEvent",
+            "startPrice": {
+                "@type": "PriceSpecification",
+                "price": str(self.starting_price),
+                "priceCurrency": "EUR"
+            },
+            "currentPrice": {
+                "@type": "PriceSpecification",
+                "price": str(self.estimated_value),
+                "priceCurrency": "EUR"
+            },
+            "endTime": self.end_time.isoformat(),
+            "category": self.category.title,
+        })
+        return base_schema

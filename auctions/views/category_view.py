@@ -6,48 +6,50 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Q, F
+from django.utils import timezone
 
 @method_decorator(cache_control(public=True, max_age=3600), name='dispatch')
 class CategoryListView(BaseListView):
+    """View for listing categories"""
     model = Category
-    template_name = 'categories/category_list.html'
-    ordering = 'title_sr'
-    paginate_by = 3  # Adjust as needed
+    template_name = 'auctions/category_list.html'
+    ordering = 'title_sr'  # Order by Serbian title by default
     
     def get_queryset(self):
-        return super().get_queryset().annotate(
-            auction_count=Count('auctions', filter=Q(auctions__is_active=True))
-        )
+        """Get only root categories (no parent)"""
+        return super().get_queryset().filter(parent__isnull=True)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # Get current page number
-        page_number = self.request.GET.get('page', 1)
-        page_suffix = f" - {_('Page')} {page_number}" if page_number != '1' else ""
+        # Add category stats
+        categories = context['object_list']
+        stats = {}
+        now = timezone.now()
         
-        # Get total number of categories
-        total_categories = self.model.objects.count()
+        # Count total active categories
+        total_categories = categories.count()
         
-        # Build meta title and description
-        meta_title = _('Categories') + page_suffix
-        meta_description = _('Browse all auction categories') + page_suffix
-        
-        # Build breadcrumbs
-        breadcrumbs = [
-            {'title': _('Home'), 'url': self.get_language_specific_url('home')},
-            {'title': _('Categories'), 'url': None}
-        ]
+        for category in categories:
+            base_query = category.auctions.filter(status='CONFIRMED')
+            active_auctions = base_query.filter(
+                start_time__lte=now,
+                end_time__gt=now
+            ).count()
+            
+            stats[category.pk] = {
+                'total_auctions': base_query.count(),
+                'active_auctions': active_auctions,
+                'subcategories': category.children.filter(is_active=True).count()
+            }
+            # Add auction count directly to category object for template use
+            category.auction_count = active_auctions
         
         context.update({
-            'meta_title': meta_title,
-            'page_title': _('Categories') + page_suffix,
-            'meta_description': meta_description,
-            'breadcrumbs': breadcrumbs,
-            'og_type': 'website',
-            'og_title': meta_title,
-            'og_description': meta_description,
-            'total_categories': total_categories,
+            'meta_title': _('Auction Categories'),
+            'meta_description': _('Browse all auction categories'),
+            'category_stats': stats,
+            'total_categories': total_categories
         })
         
         return context

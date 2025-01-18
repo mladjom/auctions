@@ -30,7 +30,7 @@
                 <option value="">{% trans "All Locations" %}</option>
                 {% for location in locations %}
                     <option value="{{ location.slug }}" {% if request.GET.location == location.slug %}selected{% endif %}>
-                        {{ location.name }}
+                        {{ location.title }}
                     </option>
                 {% endfor %}
             </select>

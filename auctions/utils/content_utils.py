@@ -147,28 +147,3 @@ class SerbianTextConverter:
 
         # Return new slug with incremented suffix
         return f"{base_slug}-{max_suffix + 1}"
-
-
-
-
-
-# Convenience functions for backward compatibility
-def is_cyrillic(text: str) -> bool:
-    """Backward compatibility function for checking Cyrillic text."""
-    return SerbianTextConverter.is_cyrillic(text)
-
-def is_latin(text: str) -> bool:
-    """Backward compatibility function for checking Latin text."""
-    return SerbianTextConverter.is_latin(text)
-
-def transliterate_text(text: str) -> str:
-    """Backward compatibility function for Cyrillic to Latin conversion."""
-    return SerbianTextConverter.to_latin(text)
-
-def latin_to_cyrillic(text: str) -> str:
-    """Backward compatibility function for Latin to Cyrillic conversion."""
-    return SerbianTextConverter.to_cyrillic(text)
-
-def normalize_text(text: str) -> str:
-    """Backward compatibility function for text normalization."""
-    return SerbianTextConverter.normalize(text)
