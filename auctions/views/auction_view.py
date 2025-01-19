@@ -21,24 +21,20 @@ class AuctionListView(BaseListView):
         
     def get_queryset(self):
         queryset = super().get_queryset()
-    
         
-        # Get filter parameters
+        # Apply filters
         filters = {
             'category__slug': self.request.GET.get('category'),
             'location__slug': self.request.GET.get('location')
         }
-        
-        # Apply non-empty filters
         filters = {k: v for k, v in filters.items() if v}
         if filters:
             queryset = queryset.filter(**filters)
             
-        
-        # Apply search query
+        # Apply search
         search_query = self.request.GET.get('q')
-        search_fields = self.get_search_fields()
-        if search_query and search_fields:
+        if search_query:
+            search_fields = self.get_search_fields()
             q_objects = Q()
             for field in search_fields:
                 q_objects |= Q(**{f"{field}__icontains": search_query})
@@ -55,7 +51,6 @@ class AuctionListView(BaseListView):
         category = Category.objects.filter(slug=category_slug).first() if category_slug else None
         location = Location.objects.filter(slug=location_slug).first() if location_slug else None
 
-        # Convert lazy translation strings to regular strings before joining
         title_parts = [gettext('Auctions')]
         if search_query:
             title_parts.append(gettext('Search: {query}').format(query=search_query))
@@ -77,15 +72,30 @@ class AuctionListView(BaseListView):
         return context
         
     def get_meta_description(self, category=None, search_query=None):
-        """Generate meta description based on filters"""
-        if search_query:
-            return _('Search results for {query}').format(query=search_query)
+        parts = []
+        
+
+        
+        location_slug = self.request.GET.get('location')
+        if location_slug:
+            location = Location.objects.filter(slug=location_slug).first()
+            if location:
+                parts.append(str(location.title))
+        
         if category:
-            return _('{category} auctions available').format(category=category.title)
-        return _('Browse our latest auctions')
+            parts.append(_('{category} auctions').format(category=category.title))
+        else:
+            parts.append(_('auctions'))
+            
+        if not search_query and not category and not location_slug:
+            return _('Browse our latest auctions')
+        
+        if search_query:
+            parts.append(_('Search results for {query}').format(query=search_query))   
+                     
+        return _('Browse {description}').format(description=' '.join(parts))
 
     def get_breadcrumbs(self):
-        """Get breadcrumbs for auction list"""
         breadcrumbs = super().get_breadcrumbs()
         
         # Add Auctions level
@@ -94,37 +104,36 @@ class AuctionListView(BaseListView):
             'url': None
         })
         
+        base_url = self.get_language_specific_url('auctions:auction-list')
+        
         # Add category level if filtered
         category_slug = self.request.GET.get('category')
         if category_slug:
             category = Category.objects.filter(slug=category_slug).first()
             if category:
-                breadcrumbs[-1]['url'] = self.get_language_specific_url('auctions:auction-list')
+                breadcrumbs[-1]['url'] = base_url
                 breadcrumbs.append({
                     'title': category.title,
                     'url': None
                 })
-        # Add location level if filtered
-        # location_slug = self.request.GET.get('location')
-        # if location_slug:
-        #     location = Location.objects.filter(slug=location_slug).first()
-        #     if location:
-        #         breadcrumbs[-1]['url'] = self.get_language_specific_url(
-        #             'auctions:auction-list',
-        #             location=location_slug
-        #         )
-        #         breadcrumbs.append({
-        #             'title': location.title,
-        #             'url': None
-        #         })
 
+        # Add location level if filtered
+        location_slug = self.request.GET.get('location')
+        if location_slug:
+            location = Location.objects.filter(slug=location_slug).first()
+            if location:
+                breadcrumbs[-1]['url'] = base_url
+                breadcrumbs.append({
+                    'title': location.title,
+                    'url': None
+                })
         
         # Add search level if searching
         search_query = self.request.GET.get('q')
         if search_query:
-            breadcrumbs[-1]['url'] = self.get_language_specific_url('auctions:auction-list')
+            breadcrumbs[-1]['url'] = base_url
             breadcrumbs.append({
-                'title': _('Search Results'),
+                'title': search_query,
                 'url': None
             })
         

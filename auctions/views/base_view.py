@@ -12,6 +12,7 @@ from .mixins_view import SchemaMixin, SEOMixin, LanguageAwareMixin, URLHandlerMi
 class BaseListView(ListView, LanguageAwareMixin, SchemaMixin, SEOMixin, URLHandlerMixin):
     """Base list view with common functionality"""
     paginate_by = 3
+    ordering = None
 
     def get_queryset(self):
         """Get base queryset with search support"""
@@ -20,15 +21,6 @@ class BaseListView(ListView, LanguageAwareMixin, SchemaMixin, SEOMixin, URLHandl
         # Check if model has is_active field before filtering
         if any(f.name == 'is_active' for f in self.model._meta.fields):
             queryset = queryset.filter(is_active=True)
-            
-        search_query = self.request.GET.get('q')
-        
-        if search_query and hasattr(self, 'get_search_fields'):
-            search_fields = self.get_search_fields()
-            q_objects = Q()
-            for field in search_fields:
-                q_objects |= Q(**{f"{field}__icontains": search_query})
-            queryset = queryset.filter(q_objects)
         
         return queryset.order_by(self.ordering)
     
