@@ -168,14 +168,14 @@ class AuctionDetailView(BaseDetailView):
         })
         
         # Add Category level
-        if self.object.category:
-            breadcrumbs.append({
-                'title': self.object.category.title,
-                'url': self.get_language_specific_url(
-                    'auctions:auction-list',
-                    #category=self.object.category.slug
-                )
-            })
+        # if self.object.category:
+        #     breadcrumbs.append({
+        #         'title': self.object.category.title,
+        #         'url': self.get_language_specific_url(
+        #             'auctions:auction-list',
+        #             #category=self.object.category.slug
+        #         )
+        #     })
         
         # Add current auction
         breadcrumbs.append({

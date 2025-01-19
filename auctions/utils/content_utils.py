@@ -100,16 +100,12 @@ class SerbianTextConverter:
     def generate_unique_slug(source_text: str, model_class, existing_instance=None) -> str:
         """
         Generate a unique slug for any Django model instance.
-        
-        Args:
-            source_text (str): The text to generate the slug from
-            model_class: The Django model class
-            existing_instance: Optional existing model instance (for updates)
-            
-        Returns:
-            str: A unique slug for the model
         """
         from django.utils.text import slugify
+        
+        # First check if this model has slug field disabled
+        if getattr(model_class, 'slug', None) is None:
+            return None
         
         # Handle empty source text
         if not source_text:
@@ -122,28 +118,32 @@ class SerbianTextConverter:
             if not base_slug:
                 base_slug = f"unnamed-{model_class.__name__.lower()}"
 
-        # If we're updating an existing instance and its slug starts with our base_slug,
-        # we can keep using the same slug
-        if existing_instance and existing_instance.slug.startswith(base_slug):
-            return existing_instance.slug
+        # Check if we're updating an existing instance with a valid slug
+        if existing_instance and getattr(existing_instance, 'slug', None):
+            if existing_instance.slug.startswith(base_slug):
+                return existing_instance.slug
 
         # Query existing objects with this base slug
-        existing_slugs = model_class.objects.filter(slug__startswith=base_slug)
-        if existing_instance:
-            existing_slugs = existing_slugs.exclude(pk=existing_instance.pk)
+        # Only proceed with querying if the model has a slug field
+        if 'slug' in [f.name for f in model_class._meta.fields]:
+            existing_slugs = model_class.objects.filter(slug__startswith=base_slug)
+            if existing_instance:
+                existing_slugs = existing_slugs.exclude(pk=existing_instance.pk)
 
-        if not existing_slugs.exists():
-            return base_slug
+            if not existing_slugs.exists():
+                return base_slug
 
-        # Find the highest number suffix
-        max_suffix = 0
-        for obj in existing_slugs:
-            try:
-                suffix = obj.slug.replace(f"{base_slug}-", "")
-                if suffix.isdigit():
-                    max_suffix = max(max_suffix, int(suffix))
-            except (ValueError, AttributeError):
-                continue
+            # Find the highest number suffix
+            max_suffix = 0
+            for obj in existing_slugs:
+                try:
+                    suffix = obj.slug.replace(f"{base_slug}-", "")
+                    if suffix.isdigit():
+                        max_suffix = max(max_suffix, int(suffix))
+                except (ValueError, AttributeError):
+                    continue
 
-        # Return new slug with incremented suffix
-        return f"{base_slug}-{max_suffix + 1}"
+            # Return new slug with incremented suffix
+            return f"{base_slug}-{max_suffix + 1}"
+        
+        return None

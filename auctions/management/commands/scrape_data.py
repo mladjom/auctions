@@ -17,30 +17,54 @@ from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.chrome.options import Options
 from datetime import datetime
 import time
-from django.db import transaction
-from django.utils.text import slugify
 from django.utils import timezone
 from ...utils.content_utils import SerbianTextConverter
+
 class Command(BaseCommand):
     help = 'Scrapes auction data from eaukcija.sud.rs and populates the database'
 
     def add_arguments(self, parser):
-        parser.add_argument(
+        # Create a mutually exclusive group for pages
+        group = parser.add_mutually_exclusive_group()
+        group.add_argument(
             '--pages',
             type=int,
-            default=2,
-            help='Number of pages to scrape'
+            help='Number of pages to scrape (default: 2)',
+            default=2
+        )
+        group.add_argument(
+            '--all-pages',
+            action='store_true',
+            help='Scrape all available pages'
         )
         parser.add_argument(
-            '--headless',
+            '--no-headless',
             action='store_true',
-            help='Run Chrome in headless mode'
+            help='Run Chrome in visible mode (default: headless)'
         )
 
-    def setup_webdriver(self, headless=False):
+    def get_total_pages(self, driver):
+        """
+        Extract the total number of pages from the pagination.
+        """
+        try:
+            # Wait for pagination to load
+            pagination = self.wait_for_element_load(driver, By.CLASS_NAME, "ant-pagination", timeout=10)
+            # Find all pagination items
+            page_items = pagination.find_elements(By.CLASS_NAME, "ant-pagination-item")
+            if page_items:
+                # Get the last page number
+                last_page = max(int(item.text) for item in page_items if item.text.isdigit())
+                return last_page
+            return 1
+        except (NoSuchElementException, TimeoutException):
+            self.stdout.write(self.style.WARNING("Could not determine total pages, defaulting to 1"))
+            return 1
+
+    def setup_webdriver(self, no_headless=False):
         service = Service("/usr/bin/chromedriver")
         options = Options()
-        if headless:
+        if not no_headless:  # Run headless by default
             options.add_argument("--headless")
         driver = webdriver.Chrome(service=service, options=options)
         driver.maximize_window()
@@ -239,17 +263,10 @@ class Command(BaseCommand):
                 # Create Latin version
                 name_lat = SerbianTextConverter.to_latin(name_sr)
                 
-                # Generate slug from Latin version
-                #slug = SerbianTextConverter.generate_unique_slug(SerbianTextConverter.normalize(name_sr), AuctionDocument)
-                
+                # Create document without slug
                 doc = AuctionDocument.objects.create(
                     title_sr=name_sr,
                     title_lat=name_lat,
-                    # slug=slug,
-                    # meta_title_sr=name_sr,
-                    # meta_title_lat=name_lat,
-                    # meta_description_sr=name_sr,
-                    # meta_description_lat=name_lat,
                     file=f'auction_documents/{auction.code}/{name_sr}'
                 )
                 auction.documents.add(doc)
@@ -424,6 +441,8 @@ class Command(BaseCommand):
 
     def save_auction_data(self, data):
         try:
+            self.stdout.write(f"Processing auction data with title: {data.get('title')}")
+
             # Get or create related objects
             category = self.get_or_create_category(data['additional_info'].get('categories'))
             executor = self.get_or_create_executor(data['additional_info'].get('executor'))
@@ -431,14 +450,20 @@ class Command(BaseCommand):
             
             # Original title (Cyrillic) and description
             title_sr = data['title']
+            if not title_sr:
+                raise ValueError("Title cannot be empty")
+            
             description_sr = data['additional_info'].get('description', '')
             
             # Convert to Latin script using proper Serbian transliteration
             title_lat = SerbianTextConverter.to_latin(title_sr)
             description_lat = SerbianTextConverter.to_latin(description_sr)
             
-            # Generate slug from simplified Latin version (using SerbianTextConverter.normalize to avoid URL issues)
-            slug = SerbianTextConverter.generate_unique_slug(SerbianTextConverter.normalize(title_sr), Auction)
+            # Generate slug from simplified Latin version
+            normalized_title = SerbianTextConverter.normalize(title_sr)
+            if not normalized_title:
+                raise ValueError("Normalized title cannot be empty")
+            slug = SerbianTextConverter.generate_unique_slug(normalized_title, Auction)
             
             # Generate meta fields
             meta_title_sr = f"{title_sr} - еАукција {data['code']}"
@@ -491,23 +516,31 @@ class Command(BaseCommand):
             return created
             
         except Exception as e:
-            self.stdout.write(self.style.ERROR(f"Error saving auction {data['code']}: {str(e)}"))
+            self.stdout.write(self.style.ERROR(f"Error saving auction {data.get('code', 'unknown')}: {str(e)}"))
+            self.stdout.write(self.style.ERROR(f"Data received: {data}"))
             raise
 
     def handle(self, *args, **options):
-        driver = self.setup_webdriver(options['headless'])
+        driver = self.setup_webdriver(options['no_headless'])
         try:
             base_url = "https://eaukcija.sud.rs"
-            max_pages = options['pages']
-            
             created_count = 0
             updated_count = 0
             
-            self.stdout.write(self.style.SUCCESS(f"Starting scrape of {max_pages} pages"))
+            # Navigate to first page to get total pages if needed
+            self.navigate_to_page(driver, base_url, 1)
             
-            # Loop through the pages and scrape auctions
+            # Determine number of pages to scrape
+            if options['all_pages']:
+                max_pages = self.get_total_pages(driver)
+                self.stdout.write(self.style.SUCCESS(f"Found {max_pages} total pages to scrape"))
+            else:
+                max_pages = options['pages']
+                self.stdout.write(self.style.SUCCESS(f"Starting scrape of {max_pages} pages"))
+            
+            # Rest of your existing scraping logic...
             for page_num in range(1, max_pages + 1):
-                self.stdout.write(self.style.SUCCESS(f"Scraping page {page_num}"))
+                self.stdout.write(self.style.SUCCESS(f"Scraping page {page_num} of {max_pages}"))
                 
                 # Navigate to the page and check if it has content
                 page_url = self.navigate_to_page(driver, base_url, page_num)
@@ -541,6 +574,7 @@ class Command(BaseCommand):
             
             self.stdout.write(self.style.SUCCESS(
                 f"\nScraping completed:\n"
+                f"Total pages scraped: {max_pages}\n"
                 f"Created: {created_count} auctions\n"
                 f"Updated: {updated_count} auctions"
             ))

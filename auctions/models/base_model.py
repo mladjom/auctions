@@ -67,20 +67,21 @@ class BaseModel(models.Model):
         # Auto-generate Latin versions if not provided
         if not self.title_lat and self.title_sr:
             self.title_lat = SerbianTextConverter.to_latin(self.title_sr)
-        if not self.description_lat and self.description_sr:
+        if hasattr(self, 'description_sr') and hasattr(self, 'description_lat') and not self.description_lat and self.description_sr:
             self.description_lat = SerbianTextConverter.to_latin(self.description_sr)
-        if not self.meta_title_lat and self.meta_title_sr:
+        if hasattr(self, 'meta_title_sr') and hasattr(self, 'meta_title_lat') and not self.meta_title_lat and self.meta_title_sr:
             self.meta_title_lat = SerbianTextConverter.to_latin(self.meta_title_sr)
-        if not self.meta_description_lat and self.meta_description_sr:
+        if hasattr(self, 'meta_description_sr') and hasattr(self, 'meta_description_lat') and not self.meta_description_lat and self.meta_description_sr:
             self.meta_description_lat = SerbianTextConverter.to_latin(self.meta_description_sr)
 
-        # Generate or update the slug
-        if not self.slug:
-            self.slug = SerbianTextConverter.generate_unique_slug(
-                source_text=self.title_lat or SerbianTextConverter.to_latin(self.title_sr),
-                model_class=self.__class__,
-                existing_instance=self,
-            )
+        # Generate or update the slug only if the model has a slug field
+        if hasattr(self, 'slug') and self.__class__.slug is not None:
+            if not self.slug:
+                self.slug = SerbianTextConverter.generate_unique_slug(
+                    source_text=self.title_lat or SerbianTextConverter.to_latin(self.title_sr),
+                    model_class=self.__class__,
+                    existing_instance=self,
+                )
 
         super().save(*args, **kwargs)
 

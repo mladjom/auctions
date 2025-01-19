@@ -10,44 +10,6 @@ from django.utils.translation import get_language
 from django.urls import reverse
 from .mixins_view import SchemaMixin, SEOMixin, LanguageAwareMixin, URLHandlerMixin
 
-class BreadcrumbMixin:
-    """Mixin for handling multilingual breadcrumb navigation"""
-    
-    def get_language_specific_url(self, url_name, **kwargs):
-        """Get language-specific URL"""
-        if not url_name:
-            return '/'
-            
-        current_language = get_language()
-        url = reverse(url_name, kwargs=kwargs)
-        
-        # Add language code to URL if using sr-Latn
-        if current_language == 'sr-Latn':
-            return f'/sr-Latn{url}'
-        return url
-
-    def get_breadcrumbs(self):
-        """Base method for breadcrumbs that handles language-specific URLs"""
-        return [{
-            'title': _('Home'),
-            'url': self.get_language_specific_url('home')
-        }]
-    
-class MetaTagsMixin:
-    """Mixin for handling meta tags and SEO"""
-    def get_meta_tags(self):
-        """Override this method to provide custom meta tags"""
-        meta = {
-            'title': getattr(self.object, 'meta_title', ''),
-            'description': getattr(self.object, 'meta_description', ''),
-        }
-        return meta
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        meta_tags = self.get_meta_tags()
-        context.update(meta_tags)
-        return context
     
 @method_decorator(cache_control(public=True, max_age=3600), name='dispatch')
 class BaseListView(ListView, LanguageAwareMixin, SchemaMixin, SEOMixin, URLHandlerMixin):
