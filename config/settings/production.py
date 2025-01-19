@@ -21,3 +21,7 @@ DATABASES = {
         'PORT': os.getenv('POSTGRES_PORT', '5432'),
     }
 }
+
+# Production Celery settings
+CELERY_BROKER_URL = 'redis://your-production-redis-url:6379/0'
+CELERY_RESULT_BACKEND = 'redis://your-production-redis-url:6379/0'

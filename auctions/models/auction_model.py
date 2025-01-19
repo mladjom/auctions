@@ -7,14 +7,11 @@ from .executor_model import Executor
 from .location_model import Location
 from .image_model import Image
 from .auction_document_model import AuctionDocument
-from django.urls import reverse
-from django.utils import timezone
 
 class Auction(BaseModel):
     STATUS_CHOICES = [
         ('CONFIRMATION_IN_PROGRESS', _('Потврђивање у току')),
         ('CONFIRMED', _('Потврђено')),
-        ('EXPIRED', _('Истекло')),
     ]
 
     # Basic information
@@ -103,16 +100,6 @@ class Auction(BaseModel):
 
     def __str__(self):
         return f"{self.code} - {self.title_sr}"
-
-    @property
-    def is_active(self):
-        """Check if auction is currently active"""
-        now = timezone.now()
-        return (
-            self.status == 'CONFIRMED' and 
-            self.start_time <= now and 
-            self.end_time > now
-        )
     
     def get_schema_data(self):
         """Override schema data for auctions"""

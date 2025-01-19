@@ -1,13 +1,10 @@
 # views/base_view.py
 from django.views.generic import ListView, DetailView
-from django.db.models import Q, F
+from django.db.models import Q
 from django.views.decorators.cache import cache_control
 from django.utils.decorators import method_decorator
 import json
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from django.utils.translation import get_language
-from django.urls import reverse
 from .mixins_view import SchemaMixin, SEOMixin, LanguageAwareMixin, URLHandlerMixin
 
     
@@ -90,9 +87,37 @@ class BaseDetailView(DetailView, LanguageAwareMixin, SchemaMixin, SEOMixin, URLH
         }
         schema_data = json.dumps(schema_data, default=str)
         
+        prev_obj, next_obj = self.get_navigation_objects()
+        
         context.update({
             'breadcrumbs': breadcrumbs,
             'schema_data': schema_data,
+            'previous_object': prev_obj,
+            'next_object': next_obj,
+            'related_objects': self.get_related_objects()
         })
         
         return context
+    
+    def get_navigation_objects(self):
+        """Get previous and next objects"""
+        try:
+            queryset = self.get_queryset()
+            prev_obj = queryset.filter(
+                created_at__lt=self.object.created_at
+            ).order_by('-created_at').first()
+            next_obj = queryset.filter(
+                created_at__gt=self.object.created_at
+            ).order_by('created_at').first()
+            return prev_obj, next_obj
+        except:
+            return None, None
+
+    def get_related_objects(self, limit=4):
+        """Get related objects"""
+        try:
+            return self.model.objects.filter(
+                is_active=True
+            ).exclude(pk=self.object.pk)[:limit]
+        except:
+            return []

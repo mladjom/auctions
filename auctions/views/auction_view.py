@@ -5,9 +5,8 @@ from django.utils.translation import gettext_lazy as _, gettext
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
 from ..models import Auction, Category, Location
-from django.db.models import Q, F
-from django.urls import reverse
-from django.contrib import messages
+from django.db.models import Q
+from django.utils.timezone import now
 
 @method_decorator(cache_control(public=True, max_age=3600), name='dispatch')
 class AuctionListView(BaseListView):
@@ -22,6 +21,7 @@ class AuctionListView(BaseListView):
         
     def get_queryset(self):
         queryset = super().get_queryset()
+    
         
         # Get filter parameters
         filters = {
@@ -104,6 +104,20 @@ class AuctionListView(BaseListView):
                     'title': category.title,
                     'url': None
                 })
+        # Add location level if filtered
+        # location_slug = self.request.GET.get('location')
+        # if location_slug:
+        #     location = Location.objects.filter(slug=location_slug).first()
+        #     if location:
+        #         breadcrumbs[-1]['url'] = self.get_language_specific_url(
+        #             'auctions:auction-list',
+        #             location=location_slug
+        #         )
+        #         breadcrumbs.append({
+        #             'title': location.title,
+        #             'url': None
+        #         })
+
         
         # Add search level if searching
         search_query = self.request.GET.get('q')
@@ -166,16 +180,6 @@ class AuctionDetailView(BaseDetailView):
             'title': _('Auctions'),
             'url': self.get_language_specific_url('auctions:auction-list')
         })
-        
-        # Add Category level
-        # if self.object.category:
-        #     breadcrumbs.append({
-        #         'title': self.object.category.title,
-        #         'url': self.get_language_specific_url(
-        #             'auctions:auction-list',
-        #             #category=self.object.category.slug
-        #         )
-        #     })
         
         # Add current auction
         breadcrumbs.append({
