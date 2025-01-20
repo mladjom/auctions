@@ -1,5 +1,5 @@
-import time
 import json
+import time
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
@@ -24,47 +24,39 @@ class Command(BaseCommand):
         service = Service("/usr/bin/chromedriver")
         driver = webdriver.Chrome(service=service, options=chrome_options)
 
+        all_data = []
+
         try:
             driver.get(url)
             WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.ID, "ContentPlaceHolder1_getOpstinaKO_dropOpstina"))
             )
-            
-            # Initialize the data structure
-            data = {"municipalities": []}
-            
+
+            # Locate the select element
+            select_element = driver.find_element(By.ID, "ContentPlaceHolder1_getOpstinaKO_dropOpstina")
+            options = select_element.find_elements(By.TAG_NAME, "option")
+
             while True:
                 try:
-                    # Get the municipalities dropdown
+                    # Dynamically get the total number of options
                     select_element = WebDriverWait(driver, 10).until(
                         EC.presence_of_element_located((By.ID, "ContentPlaceHolder1_getOpstinaKO_dropOpstina"))
                     )
                     select = Select(select_element)
                     total_options = len(select.options)
 
-                    # Skip the first option if it's a placeholder
-                    start_index = 1 if select.options[0].get_attribute("value") == "" else 0
-
-                    for index in range(start_index, total_options):
+                    for index in range(total_options):
                         # Re-fetch the dropdown before each selection
                         select_element = WebDriverWait(driver, 10).until(
                             EC.presence_of_element_located((By.ID, "ContentPlaceHolder1_getOpstinaKO_dropOpstina"))
                         )
                         select = Select(select_element)
 
-                        # Get municipality information
-                        municipality_option = select.options[index]
-                        municipality_name = municipality_option.text
-                        municipality_value = municipality_option.get_attribute("value")
+                        # Get the current option text and value
+                        municipality_name = select.options[index].text.strip()
+                        municipality_value = select.options[index].get_attribute("value").strip()
 
-                        # Create municipality entry
-                        municipality_entry = {
-                            "name": municipality_name,
-                            "value": municipality_value,
-                            "cadastral_municipalities": []
-                        }
-
-                        # Select the municipality
+                        # Select the option by index
                         select.select_by_index(index)
 
                         # Wait for the table to update
@@ -76,33 +68,40 @@ class Command(BaseCommand):
                         # Extract table rows
                         rows = driver.find_elements(By.XPATH, "//table[@id='ContentPlaceHolder1_getOpstinaKO_GridView']/tbody/tr")
 
-                        # Process cadastral municipalities
-                        for row in rows[1:]:  # Skip header row
-                            columns = row.find_elements(By.TAG_NAME, "td")
-                            if len(columns) >= 2:  # Ensure we have enough columns
-                                cadastral_entry = {
-                                    "name": columns[1].text.strip(),  # Name is in second column
-                                    "value": columns[2].text.strip()  # Value/code is in first column
-                                }
-                                municipality_entry["cadastral_municipalities"].append(cadastral_entry)
+                        # Prepare the municipality data structure
+                        municipality_info = {
+                            "name": municipality_name,
+                            "value": municipality_value,
+                            "cadastral_municipalities": []
+                        }
 
-                        # Add municipality to the main data structure
-                        data["municipalities"].append(municipality_entry)
-                        
-                        self.stdout.write(f"Processed municipality: {municipality_name}")
+                        # Skip the header row and process data
+                        for row in rows[1:]:
+                            columns = row.find_elements(By.TAG_NAME, "td")
+                            cadastral_name = columns[1].text.strip()
+                            cadastral_value = columns[2].text.strip()
+
+                            # Add cadastral municipality to the list
+                            municipality_info["cadastral_municipalities"].append({
+                                "name": cadastral_name,
+                                "value": cadastral_value
+                            })
+
+                        all_data.append(municipality_info)
+                        print(f"Processed: {municipality_name}")
 
                     # Exit loop after processing all options
                     break
 
                 except Exception as e:
-                    self.stdout.write(self.style.ERROR(f"An error occurred during processing: {e}"))
+                    print(f"An error occurred during processing: {e}")
                     break
 
-            # Save the data to a JSON file
-            with open('katastar_data.json', 'w', encoding='utf-8') as f:
-                json.dump(data, f, ensure_ascii=False, indent=2)
-                
-            self.stdout.write(self.style.SUCCESS("Data successfully saved to katastar_data.json"))
+            # Save the result as a JSON file
+            with open("municipalities_data.json", "w", encoding="utf-8") as f:
+                json.dump({"municipalities": all_data}, f, ensure_ascii=False, indent=4)
+
+            self.stdout.write(self.style.SUCCESS("Scraping completed and data saved to 'municipalities_data.json'"))
 
         except Exception as e:
             self.stdout.write(self.style.ERROR(f"An error occurred: {e}"))

@@ -24,3 +24,26 @@ class Location(BaseModel):
         Define the absolute URL for a Location instance.
         """
         return reverse('auctions:location-detail', kwargs={'slug': self.slug})
+
+class Municipality(models.Model):
+    name = models.CharField(max_length=255)
+    value = models.CharField(max_length=20)  # Using CharField as these appear to be codes
+    
+    class Meta:
+        verbose_name_plural = "municipalities"
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+class CadastralMunicipality(models.Model):
+    municipality = models.ForeignKey(Municipality, on_delete=models.CASCADE, related_name='cadastral_municipalities')
+    name = models.CharField(max_length=255)
+    value = models.CharField(max_length=20)
+    
+    class Meta:
+        verbose_name_plural = "cadastral municipalities"
+        ordering = ['name']
+
+    def __str__(self):
+        return f"{self.name} ({self.municipality.name})"
