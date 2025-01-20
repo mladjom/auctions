@@ -23,11 +23,11 @@ class AuctionDocumentInline(admin.TabularInline):
     get_file.short_description = _("File")
 
 class AuctionAdmin(BaseModelAdmin):
-    list_display = ('code', 'title_sr', 'title_lat', 'status', 'starting_price', 
-                   'estimated_value', 'publication_date', 'start_time', 'end_time', 
-                   'category', 'executor')
+    list_display = ('title', 'sale_number', 'is_active', 'starting_price', 
+                    'start_time', 
+                   'category')
     
-    list_filter = ('status', 'category', 'executor', 'publication_date', 
+    list_filter = ('category', 'location', 'publication_date', 
                   'start_time', 'end_time')
     
     search_fields = BaseModelAdmin.search_fields + ('code',)
