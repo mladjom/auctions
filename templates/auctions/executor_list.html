@@ -5,9 +5,8 @@
 {% block content %}
 <div class="space-y-8">
     <div class="flex justify-between items-center">
-        <h1 class="text-3xl font-bold text-gray-900">
-            {{ page_title }}
-        </h1>
+        <h1 class="text-3xl font-bold text-gray-900">{% trans "Executors" %}</h1>
+
         <p class="text-gray-600">
             {% blocktrans with counter=total_executors %}
                 Executors: {{ counter }}

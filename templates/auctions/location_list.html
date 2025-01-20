@@ -1,1 +1,61 @@
-<h1>Location List</h1>
+{# templates/auctions/executor_list.html #}
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="space-y-8">
+    <div class="flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-gray-900">{% trans "Locations" %}</h1>
+
+        <p class="text-gray-600">
+            {% blocktrans with counter=total_locations %}
+                Locations: {{ counter }}
+            {% endblocktrans %}
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for location in object_list %}
+        <div class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow duration-200">
+            <a href="{{ location.get_absolute_url }}" class="block">
+                <h2 class="text-xl font-semibold mb-2">
+                    {{ location.title }}
+                </h2>
+                {% if location.description %}
+                <p class="text-gray-600 mb-4">
+                    {{ location.description|truncatewords:20 }}
+                </p>
+                {% endif %}
+                <div class="text-sm text-gray-500">
+                    {% blocktrans count active_auction_count=location.active_auction_count %}
+                        {{ active_auction_count }} auction available
+                    {% plural %}
+                        {{ active_auction_count }} auctions available
+                    {% endblocktrans %}
+                </div>
+                {% if location.municipality %}
+                <div class="text-sm text-gray-500">
+                    {% blocktrans %}Municipality:{% endblocktrans %} {{ location.municipality }}
+                </div>
+                {% endif %}
+                {% if location.city %}
+                <div class="text-sm text-gray-500">
+                    {% blocktrans %}City:{% endblocktrans %} {{ location.city }}
+                </div>
+                {% endif %}
+                {% if location.cadastral_municipality %}
+                <div class="text-sm text-gray-500">
+                    {% blocktrans %}Cadastral Municipality:{% endblocktrans %} {{ location.cadastral_municipality }}
+                </div>
+                {% endif %}
+            </a>
+        </div>
+        {% empty %}
+        <div class="col-span-full text-center py-8 text-gray-500">
+            {% trans "No locations found" %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}
