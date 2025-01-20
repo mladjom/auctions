@@ -11,7 +11,7 @@ from .mixins_view import SchemaMixin, SEOMixin, LanguageAwareMixin, URLHandlerMi
 @method_decorator(cache_control(public=True, max_age=3600), name='dispatch')
 class BaseListView(ListView, LanguageAwareMixin, SchemaMixin, SEOMixin, URLHandlerMixin):
     """Base list view with common functionality"""
-    paginate_by = 3
+    paginate_by = 12
     ordering = None
 
     def get_queryset(self):

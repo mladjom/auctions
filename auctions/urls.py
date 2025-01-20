@@ -12,7 +12,7 @@ app_name = 'auctions'
 
 urlpatterns = [
     # Auction URLs
-    path('', AuctionListView.as_view(), name='auction-list'),
+    path('auctions/', AuctionListView.as_view(), name='auction-list'),
     path('auction/<slug:slug>/', AuctionDetailView.as_view(), name='auction-detail'),
     
     # Category URLs

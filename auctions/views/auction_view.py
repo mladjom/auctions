@@ -58,24 +58,44 @@ class AuctionListView(BaseListView):
             title_parts.append(str(category.title))
         if location:
             title_parts.append(str(location.title))
+
+        # Get base active auctions queryset
+        active_auctions = self.model.objects.filter(
+            end_time__gt=timezone.now(),
+            is_active=True
+        ) 
+               
+        # Apply filters to active auctions count
+        filters = {}
+        if category:
+            filters['category'] = category
+        if location:
+            filters['location'] = location
         
+        if filters:
+            active_auctions = active_auctions.filter(**filters)
+        
+        # Apply search to active auctions if exists
+        if search_query:
+            search_fields = self.get_search_fields()
+            q_objects = Q()
+            for field in search_fields:
+                q_objects |= Q(**{f"{field}__icontains": search_query})
+            active_auctions = active_auctions.filter(q_objects)        
+               
         context.update({
             'meta_title': ' | '.join(title_parts),
             'meta_description': self.get_meta_description(category, search_query),
             'categories': Category.objects.filter(is_active=True),
             'locations': Location.objects.filter(is_active=True),
-            'active_auctions': self.model.objects.filter(
-                end_time__gt=timezone.now()
-            ).count()
+            'active_auctions': active_auctions.count()
         })
         
         return context
         
     def get_meta_description(self, category=None, search_query=None):
         parts = []
-        
-
-        
+                
         location_slug = self.request.GET.get('location')
         if location_slug:
             location = Location.objects.filter(slug=location_slug).first()
