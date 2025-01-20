@@ -60,11 +60,11 @@
         {% block content %}{% endblock %}
 
         {% if previous_object or next_object %}
-            {% include "components/prev_next.html" %}
+            {% include "components/prev_next.html" with prev=prev_auction next=next_auction %}
         {% endif %}
 
         {% if related_objects %}
-            {% include "components/related.html" %}
+            {% include "components/related_auctions.html" with items=related_auctions %}
         {% endif %}
 
         {% if is_paginated %}

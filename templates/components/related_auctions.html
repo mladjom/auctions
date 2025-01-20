@@ -1,0 +1,194 @@
+{# templates/components/related_auctions.html #}
+
+{% load i18n %}
+<div class="mt-16">
+
+        <h3 class="text-2xl font-bold tracking-tight text-gray-900 mb-6">{% translate "Related Auctions" %}</h3>
+        
+        <div class="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-3 lg:gap-x-8">
+            {% for auction in related_objects %}
+                <div class="group relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white">
+                    {% if auction.image %}
+                        <div class="aspect-h-4 aspect-w-3 bg-gray-200 sm:aspect-none sm:h-96">
+                            <img src="{{ auction.image.url }}" 
+                                 alt="{{ auction.title }}" 
+                                 class="h-full w-full object-cover object-center sm:h-full sm:w-full">
+                        </div>
+                    {% endif %}
+                    
+                    <div class="flex flex-1 flex-col space-y-2 p-4">
+                        <h3 class="text-sm font-medium text-gray-900">
+                            <a href="{{ auction.get_absolute_url }}">
+                                <span aria-hidden="true" class="absolute inset-0"></span>
+                                {{ auction.title }}
+                            </a>
+                        </h3>
+
+                        {% if auction.location %}
+                            <p class="text-sm text-gray-500">{{ auction.location.title }}</p>
+                        {% endif %}
+
+                        <div class="flex flex-1 flex-col justify-end">
+                            <p class="text-sm italic text-gray-500">
+                                {% translate "Ends" %}: {{ auction.end_time|date:"d.m.Y." }}
+                            </p>
+                            {% if auction.category %}
+                                <p class="text-sm text-gray-500">
+                                    {{ auction.category.title }}
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+
+
+
+{% if related_objects %}
+<div class="mt-16">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6">{% trans "Related Auctions" %}</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {% for auction in related_objects %}
+        <div class="group">
+            <a href="{{ auction.get_absolute_url }}" class="block">
+                <!-- Auction Image -->
+                <div class="relative aspect-video w-full overflow-hidden rounded-lg bg-gray-100 mb-4">
+                    {% if auction.image %}
+                        <img src="{{ auction.image.url }}" 
+                             alt="{{ auction.title }}"
+                             class="h-full w-full object-cover object-center group-hover:opacity-75">
+                    {% else %}
+                        <div class="flex h-full items-center justify-center bg-gray-200">
+                            <svg class="h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Time Remaining Badge -->
+                    <div class="absolute bottom-2 right-2 bg-white/90 px-2 py-1 rounded text-sm">
+                        {{ auction.end_time|timeuntil }}
+                    </div>
+                </div>
+
+                <!-- Auction Details -->
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 group-hover:text-blue-600 truncate">
+                        {{ auction.title }}
+                    </h3>
+                    <p class="mt-1 text-sm text-gray-500">
+                        {% trans "Current Bid" %}: 
+                    </p>
+                    <p class="mt-1 text-sm text-gray-500">
+                        {{ auction.bids.count }} {% trans "bids" %}
+                    </p>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% if related_objects %}
+<section class="mt-16">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6">{% trans "Related Auctions" %}</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {% for auction in related_objects %}
+        <article class="group bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+            <a href="{{ auction.get_absolute_url }}" class="block">
+                <!-- Image Section -->
+                <div class="relative aspect-video w-full overflow-hidden rounded-t-lg bg-gray-100">
+                    {% if auction.image %}
+                        <img src="{{ auction.image.url }}" 
+                             alt="{{ auction.title }}"
+                             class="h-full w-full object-cover object-center group-hover:opacity-75 transition-opacity">
+                    {% else %}
+                        <div class="flex h-full items-center justify-center bg-gray-200">
+                            <svg class="h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Status Badges -->
+                    <div class="absolute top-2 left-2 flex gap-2">
+                        {% if auction.is_featured %}
+                        <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">
+                            {% trans "Featured" %}
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Time Remaining -->
+                    <div class="absolute bottom-2 right-2 bg-white/90 px-2 py-1 rounded text-sm font-medium">
+                        {% if auction.end_time|timeuntil == "0 minutes" %}
+                            {% trans "Ended" %}
+                        {% else %}
+                            {{ auction.end_time|timeuntil }}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Content Section -->
+                <div class="p-4">
+                    <!-- Title -->
+                    <h3 class="text-lg font-medium text-gray-900 group-hover:text-blue-600 line-clamp-2">
+                        {{ auction.title }}
+                    </h3>
+                    
+                    <!-- Description -->
+                    <p class="mt-2 text-sm text-gray-600 line-clamp-2">
+                        {{ auction.description }}
+                    </p>
+
+                    <!-- Metrics -->
+                    <div class="mt-4 flex justify-between items-center">
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">
+                                {% trans "Current Bid" %}:
+                                <span class="text-blue-600">
+                                    {% comment %} {{ auction.current_bid|default:auction.starting_price|currency }} {% endcomment %}
+                                </span>
+                            </p>
+                            <p class="text-xs text-gray-500 mt-1">
+                                {{ auction.bids.count }} {% trans "bids" %}
+                            </p>
+                        </div>
+
+                        <!-- Views -->
+                        <div class="flex items-center text-gray-500 text-sm">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                            {{ auction.view_count }}
+                        </div>
+                    </div>
+
+                    <!-- Category & Location -->
+                    <div class="mt-3 flex items-center text-xs text-gray-500 gap-3">
+                        {% if auction.category %}
+                        <span>{{ auction.category.title }}</span>
+                        {% endif %}
+                        {% if auction.location %}
+                        <span>•</span>
+                        <span>{{ auction.location.title }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
