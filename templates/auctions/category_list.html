@@ -21,8 +21,10 @@
                 <p class="text-gray-600 mb-4">{{ category.description|truncatewords:20 }}</p>
                 {% endif %}
                 <div class="text-sm text-gray-500">
-                    {% blocktrans with counter=category.auction_count %}
-                        {{ counter }} auction{{ counter|pluralize }}
+                    {% blocktrans count active_auction_count=category.active_auction_count %}
+                        {{ active_auction_count }} auction available
+                    {% plural %}
+                        {{ active_auction_count }} auctions available
                     {% endblocktrans %}
                 </div>
             </a>

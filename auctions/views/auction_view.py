@@ -61,7 +61,6 @@ class AuctionListView(BaseListView):
 
         # Get base active auctions queryset
         active_auctions = self.model.objects.filter(
-            end_time__gt=timezone.now(),
             is_active=True
         ) 
                

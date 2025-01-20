@@ -1,26 +1,48 @@
 # views/executor_view.py
-from django.db.models import Count, Avg
 from .base_view import BaseListView, BaseDetailView
 from ..models import Executor, Auction
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
+from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 
+@method_decorator(cache_control(public=True, max_age=3600), name='dispatch')
 class ExecutorListView(BaseListView):
+    """View for listing executors"""
     model = Executor
     template_name = 'auctions/executor_list.html'
-    context_object_name = 'executors'
-    search_fields = ['name', 'jurisdiction']
+    ordering = 'title_sr'  # Order by Serbian title by default
+
     
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        return queryset.annotate(
-            auction_count=Count('auctions'),
-            avg_price=Avg('auctions__starting_price')
-        )
-    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Add auction counts for each executor
+        executors = context['object_list']
+        for executor in executors:
+            executor.active_auction_count = Auction.objects.filter(
+                executor=executor,
+                is_active=True,
+            ).count()
+        
+        context.update({
+            'meta_title': _('Executors| Auctions'),
+            'meta_description': _('Browse auction executors'),
+            'total_executors': self.model.objects.filter(is_active=True).count()
+        })
+        
+        return context
+
     def get_breadcrumbs(self):
-        return [
-            {'title': 'Home', 'url': '/'},
-            {'title': 'Executors', 'url': None}
-        ]
+        breadcrumbs = super().get_breadcrumbs()
+        
+        # Add Executorslevel
+        breadcrumbs.append({
+            'title': _('Executors'),
+            'url': None
+        })
+        
+        return breadcrumbs
 
 class ExecutorDetailView(BaseDetailView):
     model = Executor

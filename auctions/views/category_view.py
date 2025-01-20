@@ -1,11 +1,9 @@
 # views/category_views.py
-from django.db.models import Count
 from .base_view import BaseListView, BaseDetailView
 from ..models import Category, Auction
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
 from django.utils.translation import gettext_lazy as _
-from django.db.models import Q, F
 from django.utils import timezone
 
 @method_decorator(cache_control(public=True, max_age=3600), name='dispatch')
@@ -22,37 +20,33 @@ class CategoryListView(BaseListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # Add category stats
+        # Add auction counts for each category
         categories = context['object_list']
-        stats = {}
-        now = timezone.now()
-        
-        # Count total active categories
-        total_categories = categories.count()
-        
         for category in categories:
-            base_query = category.auctions.filter(status='CONFIRMED')
-            active_auctions = base_query.filter(
-                start_time__lte=now,
-                end_time__gt=now
+            category.active_auction_count = Auction.objects.filter(
+                category=category,
+                is_active=True,
+                end_time__gt=timezone.now()
             ).count()
-            
-            stats[category.pk] = {
-                'total_auctions': base_query.count(),
-                'active_auctions': active_auctions,
-                'subcategories': category.children.filter(is_active=True).count()
-            }
-            # Add auction count directly to category object for template use
-            category.auction_count = active_auctions
         
         context.update({
-            'meta_title': _('Auction Categories'),
-            'meta_description': _('Browse all auction categories'),
-            'category_stats': stats,
-            'total_categories': total_categories
+            'meta_title': _('Categories | Auctions'),
+            'meta_description': _('Browse auction categories'),
+            'total_categories': self.model.objects.filter(is_active=True).count()
         })
         
         return context
+
+    def get_breadcrumbs(self):
+        breadcrumbs = super().get_breadcrumbs()
+        
+        # Add Categories level
+        breadcrumbs.append({
+            'title': _('Categories'),
+            'url': None
+        })
+        
+        return breadcrumbs
 
 @method_decorator(cache_control(public=True, max_age=3600), name='dispatch')
 class CategoryDetailView(BaseDetailView):
