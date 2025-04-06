@@ -5,12 +5,15 @@ from .views import (
     CategoryListView, CategoryDetailView,
     ExecutorListView, ExecutorDetailView,
     LocationListView, LocationDetailView,
-    TagListView, TagDetailView
+    TagListView, TagDetailView,
+    HomeView
 )
 
 app_name = 'auctions'
 
 urlpatterns = [
+    path('', HomeView.as_view(), name='home'),
+    
     # Auction URLs
     path('auctions/', AuctionListView.as_view(), name='auction-list'),
     path('auction/<slug:slug>/', AuctionDetailView.as_view(), name='auction-detail'),

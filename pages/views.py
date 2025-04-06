@@ -1,22 +1,19 @@
-# pages/view.py
-from django.shortcuts import render
-
-def home(request):
-    # Add any logic for the homepage if necessary
-    return render(request, 'pages/home.html')
-
-def about(request):
-    # Add any logic for the about page if necessary
-    return render(request, 'pages/about.html')
-
-def contact(request):
-    # Add any logic for the contact page if necessary
-    return render(request, 'pages/contact.html')
-
-def terms(request):
-    return render(request, 'pages/terms.html')
-
-def privacy(request):
-    return render(request, 'pages/privacy.html')
+from django.views.generic import ListView, DetailView
+from .models import PageModel
 
 
+class PageListView(ListView):
+    model = PageModel
+    template_name = "pages/page_list.html"
+    context_object_name = "pages"
+    queryset = PageModel.objects.filter(is_published=True)
+
+
+class PageDetailView(DetailView):
+    model = PageModel
+    template_name = "pages/page_detail.html"
+    context_object_name = "page"
+
+    def get_queryset(self):
+        """Filter only active pages."""
+        return PageModel.objects.filter(is_published=True)

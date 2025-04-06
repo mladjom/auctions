@@ -28,7 +28,7 @@ class LanguageAwareMixin:
         """Get base breadcrumbs"""
         return [{
             'title': _('Home'),
-            'url': self.get_language_specific_url('home')
+            'url': self.get_language_specific_url('auctions:home')
         }]
 
 class SchemaMixin:

@@ -30,19 +30,19 @@ class Municipality(models.Model):
     value = models.CharField(max_length=20)  # Using CharField as these appear to be codes
     
     class Meta:
-        verbose_name_plural = "municipalities"
+        verbose_name_plural = _("municipalities")
         ordering = ['name']
 
     def __str__(self):
         return self.name
 
 class CadastralMunicipality(models.Model):
-    municipality = models.ForeignKey(Municipality, on_delete=models.CASCADE, related_name='cadastral_municipalities')
+    municipality = models.ForeignKey(Municipality, on_delete=models.CASCADE, related_name=_('cadastral_municipalities'))
     name = models.CharField(max_length=255)
     value = models.CharField(max_length=20)
     
     class Meta:
-        verbose_name_plural = "cadastral municipalities"
+        verbose_name_plural = _("cadastral municipalities")
         ordering = ['name']
 
     def __str__(self):

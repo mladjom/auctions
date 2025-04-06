@@ -1,4 +1,5 @@
 # auctions/content_utils.py
+from django.utils.text import slugify
 
 class SerbianTextConverter:
     """
@@ -101,7 +102,6 @@ class SerbianTextConverter:
         """
         Generate a unique slug for any Django model instance.
         """
-        from django.utils.text import slugify
         
         # First check if this model has slug field disabled
         if getattr(model_class, 'slug', None) is None:

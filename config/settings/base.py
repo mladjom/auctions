@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "auctions.apps.AuctionsConfig",
+    "pages.apps.PagesConfig",
 ]
 
 MIDDLEWARE = [
