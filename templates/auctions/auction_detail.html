@@ -2,221 +2,224 @@
 {% load i18n %}
 
 {% block content %}
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {# Left Column - Images #}
-        <div class="lg:col-span-2 space-y-6">
-            {# Main Image #}
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-                {% if auction.image %}
-                    <img 
-                        src="{{ auction.image.url }}" 
-                        alt="{{ auction.title }}" 
-                        class="w-full h-[500px] object-cover"
-                    >
-                {% else %}
-                    <div class="w-full h-96 bg-gray-200 flex items-center justify-center">
-                        <span class="text-gray-400">{% trans "No Image Available" %}</span>
-                    </div>
-                {% endif %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    {# Left Column - Images & Description #}
+    <div class="lg:col-span-2 space-y-6">
+        {# Main Image or Placeholder #}
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            {% if auction.images.exists %}
+            <img src="{{ auction.images.first.file.url }}"
+                alt="{{ auction.images.first.alt_text|default:auction.title }}" class="w-full h-[500px] object-cover">
+            {% else %}
+            <div class="w-full h-96 bg-gray-200 flex items-center justify-center">
+                <span class="text-gray-400">{% trans "No Image Available" %}</span>
             </div>
-
-            {# Description Section #}
-            <div class="bg-white rounded-lg shadow p-6 space-y-4">
-                <h2 class="text-2xl font-bold">{{ auction.title }}</h2>
-                <div class="prose max-w-none">
-                    {{ auction.description|safe }}
-                </div>
-                
-                {# Specifications #}
-                <div class="mt-6">
-                    <h3 class="text-lg font-semibold mb-4">Specifications</h3>
-                    <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
-                        <div class="flex justify-between py-2 border-b">
-                            <dt class="text-gray-600">sdas</dt>
-                            <dd class="font-medium">dsadsa</dd>
-                        </div>
-                        <div class="flex justify-between py-2 border-b">
-                            <dt class="text-gray-600">sdas</dt>
-                            <dd class="font-medium">dsadsa</dd>
-                        </div>
-                        <div class="flex justify-between py-2 border-b">
-                            <dt class="text-gray-600">sdas</dt>
-                            <dd class="font-medium">dsadsa</dd>
-                        </div>
-                    </dl>
-                </div>
-            </div>
+            {% endif %}
         </div>
 
-        {# Right Column - Auction Info & Bidding #}
-        <div class="space-y-6">
-            {# Auction Status Card #}
-            <div class="bg-white rounded-lg shadow p-6 space-y-4">
-                <div class="flex justify-between items-center">
-                    <h1 class="text-2xl font-bold">{{ auction.title }}</h1>
-                    <span class="px-3 py-1 rounded-full text-sm font-medium
-                        {% if auction.status == 'active' %}
-                            bg-green-100 text-green-800
-                        {% elif auction.status == 'ending-soon' %}
-                            bg-yellow-100 text-yellow-800
-                        {% else %}
-                            bg-gray-100 text-gray-800
-                        {% endif %}">
-                        {{ auction.get_status_display }}
-                    </span>
-                </div>
+        {# Thumbnail Gallery - if multiple images #}
+        {% if auction.images.count > 1 %}
+        <div class="grid grid-cols-4 gap-2">
+            {% for image in auction.images.all %}
+            <div class="relative rounded-lg overflow-hidden h-24 cursor-pointer hover:opacity-90 transition">
+                <img src="{{ image.file.url }}" alt="{{ image.alt_text|default:auction.title }}"
+                    class="w-full h-full object-cover">
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
 
-                {# Price and Time Info #}
-                <div class="space-y-4">
-                    <div class="border-t pt-4">
-                        <p class="text-gray-600">Current Bid</p>
-                        <p class="text-3xl font-bold">${{ auction.current_bid }}</p>
-                        <p class="text-sm text-gray-500">{{ auction.bids_count }} bid(s)</p>
-                    </div>
-
-                    <div class="border-t pt-4">
-                        {% if auction.is_active %}
-                            <div x-data="{ timeLeft: '{{ auction.time_remaining }}' }" 
-                                 x-init="setInterval(() => updateTimeRemaining(), 1000)"
-                                 class="space-y-2">
-                                <p class="text-gray-600">Time Remaining</p>
-                                <p class="text-xl font-semibold" x-text="timeLeft"></p>
-                            </div>
-                        {% else %}
-                            <p class="text-gray-600">Ended</p>
-                            <p class="text-xl">{{ auction.end_time|date:"M d, Y H:i" }}</p>
-                        {% endif %}
-                    </div>
-                </div>
-
-                            <div class="block text-sm font-medium text-gray-700">
-                                Your Bid (Minimum: ${{ auction.starting_price }})
-                            </div>
-                            <div class="block text-sm font-medium text-gray-700">
-                                Location: {{ auction.location }}
-                            </div>
-
+        {# Description Section #}
+        <div class="bg-white rounded-lg shadow p-6 space-y-4">
+            <h2 class="text-2xl font-bold border-b pb-2">{% trans "Description" %}</h2>
+            <div class="prose max-w-none">
+                {{ auction.description|linebreaks }}
             </div>
 
-            {# Seller Information #}
-            <div class="bg-white rounded-lg shadow p-6">
-                <h2 class="text-lg font-semibold mb-4">Seller Information</h2>
-                <div class="flex items-center space-x-4">
-                    {% if auction.executor %}
-                        <img src="{{ auction.seller.profile_image.url }}" 
-                             alt="{{ auction.seller.username }}"
-                             class="w-12 h-12 rounded-full">
-                    {% else %}
-                        <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                            <span class="text-gray-500 text-xl">dsad</span>
-                        </div>
-                    {% endif %}
-                    <div>
-                        <p class="font-medium">{{ auction.seller.username }}</p>
-                        <p class="text-sm text-gray-500">Member since 12.04</p>
-                    </div>
-                </div>
-                <div class="mt-4">
-                    <a href="#" 
-                       class="text-blue-600 hover:text-blue-800 text-sm">
-                        View Profile
-                    </a>
-                </div>
-            </div> 
-
-            {# Shipping Information #}
-            {% if auction.shipping_info %}
-            <div class="bg-white rounded-lg shadow p-6">
-                <h2 class="text-lg font-semibold mb-4">Shipping Information</h2>
-                <div class="prose prose-sm">
-                    {{ auction.shipping_info|safe }}
-                </div>
+            {# Documents Section #}
+            {% if auction.documents.exists %}
+            <div class="mt-8">
+                <h3 class="text-lg font-semibold mb-4 border-b pb-2">{% trans "Documents" %}</h3>
+                <ul class="space-y-2">
+                    {% for document in auction.documents.all %}
+                    <li class="flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                            </path>
+                        </svg>
+                        <a href="{{ document.file.url }}" target="_blank" class="text-blue-600 hover:underline">
+                            {{ document.title }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
             </div>
             {% endif %}
         </div>
     </div>
 
-    {# Bid History #}
-    {% if auction.bids.exists %}
-    <div class="mt-8 bg-white rounded-lg shadow">
-        <div class="px-6 py-4 border-b">
-            <h2 class="text-lg font-semibold">Bid History</h2>
-        </div>
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Bidder
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Amount
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Time
-                        </th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    {% for bid in auction.bids.all %}
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="text-sm font-medium text-gray-900">
-                                    {{ bid.bidder.username }}
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">${{ bid.amount }}</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500">
-                                {{ bid.created_at|date:"M d, Y H:i" }}
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-    {% endif %}
+    {# Right Column - Auction Info & Details #}
+    <div class="space-y-6">
+        {# Auction Status Card #}
+        <div class="bg-white rounded-lg shadow p-6 space-y-4">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold">{{ auction.title }}</h1>
+                <span class="px-3 py-1 rounded-full text-sm font-medium
+                        {% if auction.is_active %}
+                            bg-green-100 text-green-800
+                        {% else %}
+                            bg-gray-100 text-gray-800
+                        {% endif %}">
+                    {{ auction.get_status_display }}
+                </span>
+            </div>
 
-    {# Related Auctions #}
-    {% if related_auctions %}
-    <div class="mt-8">
-        <h2 class="text-2xl font-bold mb-6">Similar Auctions</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {% for related in related_auctions %}
-                <div class="bg-white rounded-lg shadow overflow-hidden">
-                    {% if related.image %}
-                        <img src="{{ related.image.url }}" 
-                             alt="{{ related.title }}" 
-                             class="w-full h-48 object-cover">
-                    {% endif %}
-                    <div class="p-4">
-                        <h3 class="font-semibold text-lg mb-2">
-                            <a href="{{ related.get_absolute_url }}" class="hover:text-blue-600">
-                                {{ related.title }}
-                            </a>
-                        </h3>
-                        <p class="text-gray-600">${{ related.current_bid }}</p>
-                        <p class="text-sm text-gray-500">Ends {{ related.end_time|date:"M d, Y" }}</p>
-                    </div>
+            {# Code and Sale Number #}
+            <div class="text-sm text-gray-500">
+                {% trans "Code" %}: {{ auction.code }}
+                {% if auction.sale_number %}
+                | {% trans "Sale Number" %}: {{ auction.sale_number }}
+                {% endif %}
+            </div>
+
+            {# Pricing Info #}
+            <div class="border-t pt-4 space-y-4">
+                <div>
+                    <p class="text-gray-600">{% trans "Starting Price" %}</p>
+                    <p class="text-3xl font-bold">{{ auction.starting_price }} RSD</p>
                 </div>
-            {% endfor %}
+
+                <div>
+                    <p class="text-gray-600">{% trans "Estimated Value" %}</p>
+                    <p class="text-xl">{{ auction.estimated_value }} RSD</p>
+                </div>
+
+                <div>
+                    <p class="text-gray-600">{% trans "Bidding Step" %}</p>
+                    <p class="text-xl">{{ auction.bidding_step }} RSD</p>
+                </div>
+            </div>
+
+            {# Date and Time Info #}
+            <div class="border-t pt-4 space-y-4">
+                <div>
+                    <p class="text-gray-600">{% trans "Start Time" %}</p>
+                    <p class="text-xl">{{ auction.start_time|date:"d.m.Y. H:i" }}</p>
+                </div>
+
+                <div>
+                    <p class="text-gray-600">{% trans "End Time" %}</p>
+                    <p class="text-xl">{{ auction.end_time|date:"d.m.Y. H:i" }}</p>
+                </div>
+
+                <div>
+                    <p class="text-gray-600">{% trans "Publication Date" %}</p>
+                    <p class="text-xl">{{ auction.publication_date|date:"d.m.Y." }}</p>
+                </div>
+            </div>
+
+            {# Related Info #}
+            <div class="border-t pt-4 space-y-2">
+                <div>
+                    <p class="text-gray-600">{% trans "Category" %}</p>
+                    <p class="font-medium">
+                        <a href="{% url 'auctions:category-detail' auction.category.slug %}"
+                            class="text-blue-600 hover:underline">
+                            {{ auction.category.title }}
+                        </a>
+                    </p>
+                </div>
+
+                <div>
+                    <p class="text-gray-600">{% trans "Location" %}</p>
+                    <p class="font-medium">
+                        <a href="{% url 'auctions:location-detail' auction.location.slug %}"
+                            class="text-blue-600 hover:underline">
+                            {{ auction.location.title }}
+                        </a>
+                    </p>
+                </div>
+
+                {% if auction.executor %}
+                <div>
+                    <p class="text-gray-600">{% trans "Executor" %}</p>
+                    <p class="font-medium">
+                        <a href="{% url 'auctions:executor-detail' auction.executor.slug %}"
+                            class="text-blue-600 hover:underline">
+                            {{ auction.executor.title }}
+                        </a>
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+
+            {# Tags #}
+            {% if auction.tags.exists %}
+            <div class="border-t pt-4">
+                <p class="text-gray-600 mb-2">{% trans "Tags" %}</p>
+                <div class="flex flex-wrap gap-2">
+                    {% for tag in auction.tags.all %}
+                    <a href="{% url 'auctions:tag-detail' tag.slug %}"
+                        class="bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm rounded-full px-3 py-1">
+                        {{ tag.title }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {# Official Link #}
+            {% if auction.url %}
+            <div class="border-t pt-4">
+                <a href="{{ auction.url }}" target="_blank"
+                    class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition">
+                    {% trans "View on Official Site" %}
+                </a>
+            </div>
+            {% endif %}
         </div>
+
+        {# Executor Information (if available) #}
+        {% if auction.executor %}
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-lg font-semibold mb-4 border-b pb-2">{% trans "Executor Information" %}</h2>
+            <div class="space-y-2">
+                <p class="font-medium">{{ auction.executor.title }}</p>
+
+                {% if auction.executor.jurisdiction %}
+                <p class="text-gray-600">
+                    <span class="font-medium">{% trans "Jurisdiction" %}:</span>
+                    {{ auction.executor.jurisdiction }}
+                </p>
+                {% endif %}
+
+                {% if auction.executor.email %}
+                <p class="text-gray-600">
+                    <span class="font-medium">{% trans "Email" %}:</span>
+                    <a href="mailto:{{ auction.executor.email }}" class="text-blue-600 hover:underline">
+                        {{ auction.executor.email }}
+                    </a>
+                </p>
+                {% endif %}
+
+                {% if auction.executor.phone %}
+                <p class="text-gray-600">
+                    <span class="font-medium">{% trans "Phone" %}:</span>
+                    <a href="tel:{{ auction.executor.phone }}" class="text-blue-600 hover:underline">
+                        {{ auction.executor.phone }}
+                    </a>
+                </p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
     </div>
-    {% endif %}
-
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    function updateTimeRemaining() {
-        // Add your time remaining update logic here
-        // This should update the x-data timeLeft value
-    }
-</script>
+</div>
+{% if previous_object or next_object %}
+    {% include "components/prev_next.html" with prev=prev_auction next=next_auction %}
+{% endif %}
+{% if related_objects %}
+    {% include "components/related_auctions.html" with items=related_auctions %}
+{% endif %}
 {% endblock %}
