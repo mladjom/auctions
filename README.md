@@ -88,7 +88,7 @@ python manage.py runserver
 The platform includes a data scraper that collects auction data from external sources:
 
 ```bash
-python manage.py scrape_data --pages=5
+python manage.py scrape_auctions --pages=2
 ```
 
 Options:
@@ -157,5 +157,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Acknowledgments
 
 - Django framework
-- Bootstrap for UI components
+- TailWind for UI components
 - Selenium for web scraping
